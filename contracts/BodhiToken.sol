@@ -5,6 +5,8 @@ import "./SafeMath.sol";
 import "./StandardToken.sol";
 
 contract BodhiToken is StandardToken, SafeMath {
+  event TokenCreation(address indexed _to, uint256 _value);
+
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
@@ -25,8 +27,8 @@ contract BodhiToken is StandardToken, SafeMath {
     currentSupply = _presaleAmount;
   }
 
-  // Contract interface for token creation
-  function createTokens() payable external {
+  // Fallback function to accept QTUM during token sale
+  function () payable external {
     if (block.number < fundingStartBlock) throw;
     if (block.number > fundingEndBlock) throw;
     if (msg.value == 0) throw;
@@ -38,5 +40,7 @@ contract BodhiToken is StandardToken, SafeMath {
 
     currentSupply = checkedSupply;
     balances[msg.sender] += bodhiTokenNumber;
+
+    TokenCreation(msg.sender, bodhiTokenNumber);
   }
 }
