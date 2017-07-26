@@ -18,8 +18,8 @@ contract BodhiToken is MintableToken {
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
   uint256 public currentSupply;
-  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals); // 60 million BOT tokens for sale
-  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT tokens will ever be created
+  uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
+  uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
   uint256 public constant tokenExchangeRate = 60; // 60 BOT tokens per 1 QTUM
 
   address public wallet;
@@ -29,6 +29,7 @@ contract BodhiToken is MintableToken {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_wallet != address(0));
+    require(_presaleAmount <= saleAmount);
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
