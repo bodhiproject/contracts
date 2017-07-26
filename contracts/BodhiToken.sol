@@ -1,7 +1,5 @@
 pragma solidity ^0.4.10;
 
-import "./ConvertLib.sol";
-import "./SafeMath.sol";
 import "./MintableToken.sol";
 
 contract BodhiToken is MintableToken {
@@ -17,7 +15,6 @@ contract BodhiToken is MintableToken {
   // Crowdsale parameters
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
-  uint256 public currentSupply;
   uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
   uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
   uint256 public constant tokenExchangeRate = 60; // 60 BOT tokens per 1 QTUM
@@ -36,7 +33,7 @@ contract BodhiToken is MintableToken {
     wallet = _wallet;
 
     // Mint the presale tokens, distribute to a receiver
-    // Increase the currentSupply accordinglly 
+    // Increase the totalSupply accordinglly 
     mint(wallet, _presaleAmount);
   }
 
@@ -47,14 +44,11 @@ contract BodhiToken is MintableToken {
     require(msg.value > 0);
 
     uint256 tokenAmount = mul(msg.value, tokenExchangeRate);
-    uint256 checkedSupply = add(currentSupply, tokenAmount);
+    uint256 checkedSupply = add(totalSupply, tokenAmount);
 
     // Ensure new token increment does not exceed the total supply
     assert(checkedSupply <= tokenTotalSupply);
 
-    currentSupply = checkedSupply;
-    balances[msg.sender] += tokenAmount;
-
-    TokenCreation(msg.sender, tokenAmount);
+    mint(msg.sender, tokenAmount);
   }
 }

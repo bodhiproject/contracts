@@ -15,7 +15,7 @@ import './SafeMath.sol';
  */
 
 contract MintableToken is StandardToken, Ownable, SafeMath {
-  event Mint(address indexed to, uint256 amount);
+  event Mint(uint256 supply, address indexed to, uint256 amount);
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -33,9 +33,9 @@ contract MintableToken is StandardToken, Ownable, SafeMath {
    * @return A boolean that indicates if the operation was successful.
    */
   function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
-    totalSupply = add(totalSupply, _amount);
+    totalSupply += _amount;
     balances[_to] = add(balances[_to], _amount);
-    Mint(_to, _amount);
+    Mint(totalSupply, _to, _amount);
     return true;
   }
 
