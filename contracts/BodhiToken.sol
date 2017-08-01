@@ -17,6 +17,7 @@ contract BodhiToken is MintableToken {
   uint256 public fundingEndBlock;
   uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
   uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
+  uint256 public constant decayPeriod = 1000; // decay 10% per 1000 blocks
   uint256 public initialExchangeRate;
 
   address public wallet;
@@ -48,7 +49,7 @@ contract BodhiToken is MintableToken {
   function exchangeTokenAmount(uint256 weiAmount) constant returns(uint256) {
     // Token amount decay 10% every 1000 blocks
     // `decayFactor` is in 0.1%
-    uint256 decayFactor = 1000 - (block.number - fundingStartBlock) / 1000 * 100;
+    uint256 decayFactor = 1000 - (block.number - fundingStartBlock) / decayPeriod * 100;
     assert(decayFactor >= 0);
 
     uint256 rate = initialExchangeRate * decayFactor / 1000;
