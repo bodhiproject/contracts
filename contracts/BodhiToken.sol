@@ -3,10 +3,6 @@ pragma solidity ^0.4.10;
 import "./MintableToken.sol";
 
 contract BodhiToken is MintableToken {
-  // User exchange token will emit this event.
-  // For presale and after ICO mint, there will be a `Mint` event.
-  event TokenCreation(address indexed _to, uint256 _value);
-
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
@@ -70,5 +66,12 @@ contract BodhiToken is MintableToken {
     assert(checkedSupply <= tokenTotalSupply);
 
     mint(msg.sender, tokenAmount);
+  }
+
+  function mintReservedTokens(uint256 _amount) onlyOwner {
+    uint256 checkedSupply = add(totalSupply, _amount);
+    require(checkedSupply < tokenTotalSupply);
+
+    mint(wallet, _amount);
   }
 }
