@@ -17,24 +17,43 @@ contract BodhiToken is MintableToken {
   uint256 public fundingEndBlock;
   uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
   uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
-  uint256 public constant tokenExchangeRate = 60; // 60 BOT tokens per 1 QTUM
+  uint256 public initialExchangeRate;
 
   address public wallet;
 
   // Constructor
-  function BodhiToken(uint256 _fundingStartBlock, uint256 _fundingEndBlock, uint256 _presaleAmount, address _wallet) {
+  function BodhiToken(
+    uint256 _fundingStartBlock, 
+    uint256 _fundingEndBlock, 
+    uint256 _initialExchangeRate, 
+    uint256 _presaleAmount, 
+    address _wallet) {
+
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_wallet != address(0));
     require(_presaleAmount <= saleAmount);
+    require(_initialExchangeRate > 0);
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
     wallet = _wallet;
+    initialExchangeRate = _initialExchangeRate;
 
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordinglly 
     mint(wallet, _presaleAmount);
+  }
+
+  function exchangeTokenAmount(uint256 weiAmount) constant returns(uint256) {
+    // Token amount decay 10% every 1000 blocks
+    // `decayFactor` is in 0.1%
+    uint256 decayFactor = 1000 - (block.number - fundingStartBlock) / 1000 * 100;
+    assert(decayFactor >= 0);
+
+    uint256 rate = initialExchangeRate * decayFactor / 1000;
+
+    return mul(rate, weiAmount);
   }
 
   // Fallback function to accept QTUM during token sale
@@ -43,7 +62,7 @@ contract BodhiToken is MintableToken {
     require(block.number <= fundingEndBlock);
     require(msg.value > 0);
 
-    uint256 tokenAmount = mul(msg.value, tokenExchangeRate);
+    uint256 tokenAmount = exchangeTokenAmount(msg.value);
     uint256 checkedSupply = add(totalSupply, tokenAmount);
 
     // Ensure new token increment does not exceed the total supply
