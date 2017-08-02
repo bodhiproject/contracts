@@ -66,6 +66,8 @@ contract BodhiToken is MintableToken {
     assert(checkedSupply <= tokenTotalSupply);
 
     mint(msg.sender, tokenAmount);
+
+    forwardFunds();
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
@@ -73,5 +75,10 @@ contract BodhiToken is MintableToken {
     require(checkedSupply < tokenTotalSupply);
 
     mint(wallet, _amount);
+  }
+
+  // Send ether to the fund collection wallet
+  function forwardFunds() internal {
+    wallet.transfer(msg.value);
   }
 }
