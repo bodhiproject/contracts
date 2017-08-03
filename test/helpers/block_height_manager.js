@@ -25,7 +25,7 @@ function BlockHeightManager(web3) {
         jsonrpc: '2.0',
         method: 'evm_snapshot',
         id: new Date().getTime(),
-        params: [snapshotId]
+        params: []
       }, (err, result) => {
         if (err) {
           return reject(err);

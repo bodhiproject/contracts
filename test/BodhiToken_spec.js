@@ -5,7 +5,9 @@ const config = require('../config/config')(web3);
 contract('BodhiToken', function(accounts) {
   const blockHeightManager = new BlockHeightManager(web3);
 
-  afterEach('revert', blockHeightManager.revert);
+  beforeEach(blockHeightManager.snapshot);
+
+  afterEach(blockHeightManager.revert);
 
   it("should mint presale token and allocate to the wallet", async function() {
     let token = await BodhiToken.deployed();
