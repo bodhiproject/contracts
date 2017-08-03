@@ -1,10 +1,12 @@
-var BodhiToken = artifacts.require("./BodhiToken.sol");
+let BodhiToken = artifacts.require("./BodhiToken.sol");
+let config = require('../config/config')(web3);
 
 module.exports = function(deployer) {
+  console.log(config);
   deployer.deploy(BodhiToken, 
-    100,  // startBlock
-    500,  // endBlock 
-    100,  // initialExchangeRate
-    web3.toWei(20e6), // presaleAmount
-    web3.eth.coinbase); // wallet
+    config.startBlock,  // startBlock
+    config.endBlock,  // endBlock 
+    config.initialExchangeRate,  // initialExchangeRate
+    config.presaleAmount, // presaleAmount
+    config.wallet); // wallet
 };
