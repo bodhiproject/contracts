@@ -1,4 +1,8 @@
+const bluebird = require('bluebird');
+
 function BlockHeightManager(web3) {
+
+  let getBlockNumber = bluebird.promisify(web3.eth.getBlockNumber);
 
   let snapshotId;
 
@@ -63,7 +67,7 @@ function BlockHeightManager(web3) {
   }
 
   this.mineTo = async (height) => {
-    let currentHeight = web3.eth.blockNumber; 
+    let currentHeight = await getBlockNumber(); 
     if (currentHeight > height) {
       throw new Error('Expecting height: ' + height + 'is not reachable');
     }
