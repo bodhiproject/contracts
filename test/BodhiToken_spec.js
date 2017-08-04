@@ -62,6 +62,44 @@ contract('BodhiToken', function(accounts) {
         });
       }, /invalid opcode/);
     });
+
+    it('reject buying token after endBlock', async () => {
+      let token = await BodhiToken.deployed();
+
+      await blockHeightManager.mineTo(config.endBlock + 10);
+
+      assert.isAtLeast(web3.eth.blockNumber, config.endBlock);
+
+      let from = accounts[1]; // Using the second account to purchase BOT
+      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+
+      assert.throws(() => {
+        web3.eth.sendTransaction({
+          to: token.address,
+          from,
+          value: 0
+        });
+      }, /invalid opcode/);
+    });
+
+    it('accept buying token between start and end block', async () => {
+      let token = await BodhiToken.deployed();
+
+      let destBlock = parseInt((config.startBlock + config.endBlock) / 2);
+
+      await blockHeightManager.mineTo(destBlock);
+
+      let from = accounts[0]; // Using the second account to purchase BOT
+      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+
+      assert.doesNotThrow(() => {
+        let tx = web3.eth.sendTransaction({
+          to: token.address,
+          from,
+          value
+        });
+      });
+    })
   });
 
   describe('forward funds', () => {
