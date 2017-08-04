@@ -1,11 +1,11 @@
 const BodhiToken = artifacts.require("./BodhiToken.sol");
 const BlockHeightManager = require('./helpers/block_height_manager');
 const config = require('../config/config')(web3);
+const assert = require('chai').assert;
 
 contract('BodhiToken', function(accounts) {
   const blockHeightManager = new BlockHeightManager(web3);
-
-  beforeEach(blockHeightManager.snapshot);
+  before(blockHeightManager.snapshot);
 
   afterEach(blockHeightManager.revert);
 
@@ -33,14 +33,19 @@ contract('BodhiToken', function(accounts) {
     console.log(ret.logs[0].args, totalSupply, balance);
   });
 
+  it('initialized correctly', async () => {
+    let token = await BodhiToken.deployed();
+
+    let fundingStartBlock = await token.fundingStartBlock();
+    let fundingEndBlock = await token.fundingEndBlock();
+
+    assert(fundingStartBlock > 0);
+    assert(fundingEndBlock > fundingStartBlock);
+  });
+
   describe('exchange open period', () => {
     it('reject buying token before startBlock', async () => {
       let token = await BodhiToken.deployed();
-      console.log('Token fundingStartBlock', 
-        await token.fundingStartBlock());
-
-      console.log('Token saleAmount', 
-        await token.saleAmount());
 
       assert(web3.eth.blockNumber < config.startBlock, 
         'current block height should less than start block height');;
@@ -52,11 +57,14 @@ contract('BodhiToken', function(accounts) {
       console.log('Before', web3.eth.getBalance(from));
 
       try {
-        let txHash = await web3.eth.sendTransaction({
+        web3.eth.sendTransaction({
           to: token.address,
           from,
           value: 0
         });
+
+        // 
+        assert.fail();
       } catch(e) {
         console.log(e);
       }

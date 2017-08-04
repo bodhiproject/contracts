@@ -1,0 +1,19 @@
+{
+  "name": "bodhi-crowdsale-contracts",
+  "version": "1.0.0",
+  "description": "Bodhi Token crowdsale contracts",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bodhiproject/contracts.git"
+  },
+  "author": "Yuanfei Zhu<yuanfei@bodhi.network>",
+  "dependencies": {
+    "chai": "^4.1.0"
+  }
+}
