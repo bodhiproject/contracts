@@ -54,28 +54,13 @@ contract('BodhiToken', function(accounts) {
       let from = accounts[1]; // Using the second account to purchase BOT
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
 
-      console.log('Before', web3.eth.getBalance(from));
-
-      try {
+      assert.throws(() => {
         web3.eth.sendTransaction({
           to: token.address,
           from,
           value: 0
         });
-
-        // 
-        assert.fail();
-      } catch(e) {
-        console.log(e);
-      }
-
-      // let ret = await web3.eth.getTransactionReceipt(txHash);
-      // console.log(ret);
-// 
-      // ret = await web3.eth.getTransaction(txHash);
-      // console.log(ret);
-// 
-      // console.log('After', web3.eth.getBalance(from));
+      }, /invalid opcode/);
     });
   });
 
