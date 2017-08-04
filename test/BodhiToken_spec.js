@@ -82,15 +82,18 @@ contract('BodhiToken', function(accounts) {
       }, /invalid opcode/);
     });
 
-    it('accept buying token between start and end block', async () => {
+    it.only('accept buying token between start and end block', async () => {
       let token = await BodhiToken.deployed();
 
       let destBlock = parseInt((config.startBlock + config.endBlock) / 2);
 
       await blockHeightManager.mineTo(destBlock);
 
-      let from = accounts[0]; // Using the second account to purchase BOT
+
+      let from = accounts[1]; // Using the second account to purchase BOT
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+
+      console.log(await web3.eth.getBalance(from))
 
       assert.doesNotThrow(() => {
         let tx = web3.eth.sendTransaction({
@@ -98,6 +101,8 @@ contract('BodhiToken', function(accounts) {
           from,
           value
         });
+
+        
       });
     })
   });

@@ -1,8 +1,10 @@
 pragma solidity ^0.4.10;
 
-import "./MintableToken.sol";
+import './StandardToken.sol';
+import './Ownable.sol';
+import './SafeMath.sol';
 
-contract BodhiToken is MintableToken {
+contract BodhiToken is StandardToken, SafeMath, Ownable {
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
@@ -17,6 +19,8 @@ contract BodhiToken is MintableToken {
   uint256 public initialExchangeRate;
 
   address public wallet;
+
+  event Mint(uint256 supply, address indexed to, uint256 amount);
 
   // Constructor
   function BodhiToken(
@@ -67,7 +71,6 @@ contract BodhiToken is MintableToken {
 
     mint(msg.sender, tokenAmount);
 
-    forwardFunds();
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
@@ -80,5 +83,15 @@ contract BodhiToken is MintableToken {
   // Send ether to the fund collection wallet
   function forwardFunds() internal {
     wallet.transfer(msg.value);
+  }
+
+   /**
+   * @dev Function to mint tokens
+   */
+  function mint(address _to, uint256 _amount) internal returns (bool) {
+    totalSupply += _amount;
+    balances[_to] = add(balances[_to], _amount);
+    Mint(totalSupply, _to, _amount);
+    return true;
   }
 }
