@@ -95,15 +95,15 @@ contract('BodhiToken', function(accounts) {
 
       console.log(await web3.eth.getBalance(from))
 
-      assert.doesNotThrow(() => {
-        let tx = web3.eth.sendTransaction({
-          to: token.address,
-          from,
-          value
-        });
-
-        
+      let tx = web3.eth.sendTransaction({
+        to: token.address,
+        from,
+        value
       });
+
+      let balance = await token.balanceOf(from);
+
+      assert.ok(balance.eq(web3.toWei(100)));
     })
   });
 
