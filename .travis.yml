@@ -1,5 +1,4 @@
 language: node_js
-dist: trusty
 
 node_js:
   - "7"
@@ -14,3 +13,12 @@ addons:
     packages:
     - gcc-4.8
     - g++-4.8
+
+before_install:
+  - yarn global add truffle
+
+install:
+  - yarn install
+
+script:
+  - npm test
