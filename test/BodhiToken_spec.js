@@ -40,7 +40,7 @@ contract('BodhiToken', function(accounts) {
   });
 
   describe('exchange open period', () => {
-    it.only('reject buying token before startBlock', async () => {
+    it('reject buying token before startBlock', async () => {
       let token = await BodhiToken.deployed();
 
       assert(await requester.getBlockNumberAsync() < config.startBlock, 
@@ -64,7 +64,7 @@ contract('BodhiToken', function(accounts) {
       }
     });
 
-    it.only('reject buying token after endBlock', async () => {
+    it('reject buying token after endBlock', async () => {
       let token = await BodhiToken.deployed();
 
       await blockHeightManager.mineTo(config.endBlock + 10);
@@ -98,9 +98,7 @@ contract('BodhiToken', function(accounts) {
       let from = accounts[1]; // Using the second account to purchase BOT
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
 
-      console.log(await web3.eth.getBalance(from))
-
-      let tx = web3.eth.sendTransaction({
+      await requester.sendTransactionAsync({
         to: token.address,
         from,
         value
@@ -115,8 +113,6 @@ contract('BodhiToken', function(accounts) {
   describe('forward funds', () => {
     it('should foward funds to the wallet', async () => {
       let token = await BodhiToken.deployed();
-
-      console.log(web3.eth.blockNumber) ;
     });
   });
 });
