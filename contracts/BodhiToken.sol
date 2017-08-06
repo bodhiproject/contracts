@@ -41,8 +41,6 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     wallet = _wallet;
     initialExchangeRate = _initialExchangeRate;
 
-    totalSupply = 100;
-
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordinglly 
     mint(wallet, _presaleAmount);
@@ -72,7 +70,7 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     assert(checkedSupply <= tokenTotalSupply);
 
     mint(msg.sender, tokenAmount);
-
+    forwardFunds();
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
