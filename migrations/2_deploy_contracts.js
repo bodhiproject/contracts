@@ -7,6 +7,7 @@ module.exports = function(deployer) {
     config.startBlock,  // startBlock
     config.endBlock,  // endBlock 
     config.initialExchangeRate,  // initialExchangeRate
+    config.decayPeriod,
     config.presaleAmount, // presaleAmount
     '0x12345'
   );
