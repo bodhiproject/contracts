@@ -47,7 +47,8 @@ TODO: figure out how contract deployment in QTUM works.
 Remember to sign transactions in the Parity signer from the UI.
     
 ## TODOs
-
+1. Deploy the contract to QTUM testnet. 
+2. Document the deployment procedure.
 
 ## License
 MIT
