@@ -106,13 +106,65 @@ contract('BodhiToken', function(accounts) {
 
       let balance = await token.balanceOf(from);
 
-      assert.ok(balance.eq(web3.toWei(100)));
+      assert.equal(balance.toNumber(), web3.toWei(100));
     })
   });
 
   describe('forward funds', () => {
     it('should foward funds to the wallet', async () => {
       let token = await BodhiToken.deployed();
+    });
+  });
+
+  describe('decayPeriod', () => {
+
+    it('should be positive', async () => {
+      try {
+        let token = await BodhiToken.new(
+          10,
+          50,
+          10,
+          -10, // negative decayPeriod is forbidden
+          20,
+          accounts[1]
+        );
+
+        assert.fail();
+      }
+      catch(e) {
+        assert.match(e.message, /invalid opcode/);
+      }
+    });
+
+
+    it('should less than the open period', async () => {
+      try {
+        let token = await BodhiToken.new(
+          10,
+          50,
+          10,
+          100, // 100 > 50(endBlock) - 10(startBlock)
+          20,
+          accounts[1]
+        );
+
+        assert.fail();
+      }
+      catch(e) {
+        assert.match(e.message, /invalid opcode/);
+      }
+    });
+
+    it('should return the correct exchange rate', async() => {
+      let token = await BodhiToken.deployed();
+
+      await blockHeightManager.mineTo(config.startBlock);
+      let startingExchangeRate = await token.exchangeTokenAmount(1);
+      assert.equal(startingExchangeRate.toNumber(), 100);
+
+      await blockHeightManager.mineTo(config.startBlock + config.decayPeriod + 1)
+      let firstDecayExchangeRate = await token.exchangeTokenAmount(1);
+      assert.equal(firstDecayExchangeRate.toNumber(), 90);
     });
   });
 });
