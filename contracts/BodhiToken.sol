@@ -79,6 +79,10 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     require(block.number <= fundingEndBlock);
     require(msg.value > 0);
 
+    // softCap hit and countdown ends
+    // fail the transaction and return the funds
+    assert(!softCapReached() || !countdownEnds());
+
     uint256 tokenAmount = exchangeTokenAmount(msg.value);
     uint256 checkedSupply = add(totalSupply, tokenAmount);
 
@@ -109,5 +113,24 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     balances[_to] = add(balances[_to], _amount);
     Mint(totalSupply, _to, _amount);
     return true;
+  }
+
+  function softCapReached() returns (bool _softCapReached) {
+    if (totalSupply > softCap) {
+      if (!_softCapReached) {
+        // softCap is hit for the first time
+        // update the countdown
+        countdownEndsAt = now + countdownHours hours;
+        _softCapReached = true;
+      }
+    }
+
+    return _softCapReached;
+  }
+
+  function countdownEnds() returns (bool) {
+    // countdownEndsAt is set only if softCap is reached
+    // if countdownEndsAt is past, countdown is ended
+    return countdownEndsAt > 0 && now > countdownEndsAt;
   }
 }
