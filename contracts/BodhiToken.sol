@@ -18,6 +18,10 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
   uint256 public decayPeriod; // decay 10% per `decayPeriod` blocks
   uint256 public initialExchangeRate;
 
+  uint256 public softCap;
+  // countdown 48 hours after the softCap is reached
+  uint8 public countdownHours;
+
   address public wallet;
 
   event Mint(uint256 supply, address indexed to, uint256 amount);
@@ -29,6 +33,8 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     uint256 _initialExchangeRate, 
     uint256 _decayPeriod,
     uint256 _presaleAmount, 
+    uint256 _softCap,
+    uint8 _countdownHours,
     address _wallet) {
 
     require(_fundingStartBlock >= block.number);
@@ -38,6 +44,12 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     require(_initialExchangeRate > 0);
     // decayPeriod must be positive and less than the open period
     require(_decayPeriod > 0 && _decayPeriod <= (_fundingEndBlock - _fundingStartBlock));
+
+    // softCap should be greater than the presaleAmount as it's sold
+    // It's also required to be less than the saleAmount, otherwise there no token to sell.
+    require(_softCap > _presaleAmount && _softCap < saleAmount);
+
+    require(_countdownHours > 0);
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
