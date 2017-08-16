@@ -7,7 +7,10 @@ function Config(web3) {
     initialExchangeRate: 100,
     decayPeriod: 20, // decay 10% every 20 blocks
     presaleAmount: web3.toWei(20e6),
-   // wallet: await bluebird.promisify(web3.eth.getCoinbase)()
+    // wallet: await bluebird.promisify(web3.eth.getCoinbase)()
+
+    softCap: web3.toWei(30e6),
+    countdownHours: 48
   }
 };
 

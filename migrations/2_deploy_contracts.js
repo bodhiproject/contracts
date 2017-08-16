@@ -9,6 +9,8 @@ module.exports = function(deployer) {
     config.initialExchangeRate,  // initialExchangeRate
     config.decayPeriod,
     config.presaleAmount, // presaleAmount
+    config.softCap,
+    config.countdownHours,
     '0x12345'
   );
 };
