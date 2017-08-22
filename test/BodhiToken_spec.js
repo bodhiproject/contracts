@@ -113,6 +113,26 @@ contract('BodhiToken', function(accounts) {
   describe('forward funds', () => {
     it('should foward funds to the wallet', async () => {
       let token = await BodhiToken.deployed();
+      let wallet = await token.wallet();
+
+      // Initial balance of the wallet
+      let walletBalance = await requester.getBalanceAsync(wallet);
+
+      assert.equal(walletBalance.valueOf(), 0);
+
+      await blockHeightManager.mineTo(config.startBlock + 1);
+
+      let from = accounts[1]; // Using the second account to purchase BOT
+      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+
+      await requester.sendTransactionAsync({
+        to: token.address,
+        from,
+        value
+      });
+
+      walletBalance = await requester.getBalanceAsync(wallet);
+      assert(walletBalance.eq(value));
     });
   });
 
