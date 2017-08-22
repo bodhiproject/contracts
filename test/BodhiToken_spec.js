@@ -107,7 +107,34 @@ contract('BodhiToken', function(accounts) {
       let balance = await token.balanceOf(from);
 
       assert.equal(balance.toNumber(), web3.toWei(100));
-    })
+    });
+
+    it('reject zero value purchase', async () => {
+      let token = await BodhiToken.deployed();
+
+      await blockHeightManager.mineTo((config.startBlock + config.endBlock) / 2);
+
+      let blockNumber = await requester.getBlockNumberAsync();
+
+      // Between the valid period
+      assert.isAtMost(blockNumber, config.endBlock);
+      assert.isAtLeast(blockNumber, config.startBlock);
+
+      let from = accounts[1]; // Using the second account to purchase BOT
+      let value = web3.toWei(0);
+
+      try {
+        await requester.sendTransactionAsync({
+          to: token.address,
+          from,
+          value
+        });
+
+        assert.fail();
+      } catch(e) {
+        assert.match(e.toString(), /invalid opcode/);
+      }
+    });
   });
 
   describe('forward funds', () => {
