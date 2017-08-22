@@ -245,11 +245,26 @@ contract('BodhiToken', function(accounts) {
       assert.equal(firstDecayExchangeRate.toNumber(), 90);
     });
 
-    it.only('should forbid negative token amount for the exchange rate', async () => {
+    it('should forbid invalid rate for the exchange rate', async () => {
       let token = await BodhiToken.deployed();
 
       try {
         let rate = await token.exchangeTokenAmount(1);
+        assert.fail();
+      }
+      catch(e) {
+        assert.match(e.message, /invalid opcode/);
+      }
+    });
+
+    it('should forbid negative for the exchange rate', async () => {
+      let token = await BodhiToken.deployed();
+
+      // Good to go
+      await blockHeightManager.mineTo(config.startBlock);
+
+      try {
+        let rate = await token.exchangeTokenAmount(-1);
         assert.fail();
       }
       catch(e) {
