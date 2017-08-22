@@ -111,7 +111,7 @@ contract('BodhiToken', function(accounts) {
   });
 
   describe('forward funds', () => {
-    it('should foward funds to the wallet', async () => {
+    it('should forward funds to the wallet', async () => {
       let token = await BodhiToken.deployed();
       let wallet = await token.wallet();
 
@@ -133,6 +133,37 @@ contract('BodhiToken', function(accounts) {
 
       walletBalance = await requester.getBalanceAsync(wallet);
       assert(walletBalance.eq(value));
+    });
+
+    it('should revert all funds if transaction is failed', async () => {
+      let token = await BodhiToken.deployed();
+      let wallet = await token.wallet();
+
+      let walletBalance = await requester.getBalanceAsync(wallet);
+
+      // Not start yet, it's required to be less than 
+      // 5 transactions from now on
+      await blockHeightManager.mineTo(config.startBlock - 5);
+
+      let from = accounts[1]; // Using the second account to purchase BOT
+      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+
+      try {
+        await requester.sendTransactionAsync({
+          to: token.address,
+          from,
+          value
+        });
+
+        assert.fail();
+      } 
+      catch(e) {
+        assert.match(e.message, /invalid opcode/);
+      }
+
+
+      walletBalance = await requester.getBalanceAsync(wallet);
+      assert(walletBalance.valueOf(), 0);
     });
   });
 
