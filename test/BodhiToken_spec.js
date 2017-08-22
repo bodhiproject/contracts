@@ -244,5 +244,17 @@ contract('BodhiToken', function(accounts) {
       let firstDecayExchangeRate = await token.exchangeTokenAmount(1);
       assert.equal(firstDecayExchangeRate.toNumber(), 90);
     });
+
+    it.only('should forbid negative token amount for the exchange rate', async () => {
+      let token = await BodhiToken.deployed();
+
+      try {
+        let rate = await token.exchangeTokenAmount(1);
+        assert.fail();
+      }
+      catch(e) {
+        assert.match(e.message, /invalid opcode/);
+      }
+    });
   });
 });

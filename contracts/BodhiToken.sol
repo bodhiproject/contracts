@@ -54,7 +54,7 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     // Token amount decay 10% every 1000 blocks
     // `decayFactor` is in 0.1%
     uint256 decayFactor = 1000 - (block.number - fundingStartBlock) / decayPeriod * 100;
-    assert(decayFactor >= 0);
+    assert(decayFactor >= 0 && decayFactor < 1000);
 
     uint256 rate = initialExchangeRate * decayFactor / 1000;
 
