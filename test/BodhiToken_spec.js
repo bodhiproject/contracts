@@ -278,4 +278,42 @@ contract('BodhiToken', function(accounts) {
     let totalSupply = await token.totalSupply();
     assert.equal(totalSupply.toNumber(), config.presaleAmount);
   });
+
+  it('should be able to mint the reserved portion to the wallet', async() => {
+    let token = await BodhiToken.deployed();
+    let totalSupply = await token.totalSupply();
+    let wallet = await token.wallet();
+    let tokenTotalSupply = await token.tokenTotalSupply();
+
+    let balanceBefore = await token.balanceOf(wallet);
+    let residualTokens = tokenTotalSupply.sub(totalSupply);
+
+    await token.mintReservedTokens(residualTokens);
+
+    let balanceAfter = await token.balanceOf(wallet);
+
+    assert.equal(
+      balanceBefore.add(residualTokens).valueOf(), 
+      balanceAfter.valueOf()
+    );
+  });
+
+  it('forbids minting more than token total supply', async() => {
+    let token = await BodhiToken.deployed();
+    let totalSupply = await token.totalSupply();
+    let wallet = await token.wallet();
+    let tokenTotalSupply = await token.tokenTotalSupply();
+
+    let balanceBefore = await token.balanceOf(wallet);
+    // One more BOT above the limit
+    let overflowAmount = tokenTotalSupply.sub(totalSupply).add(1);
+
+    try {
+      await token.mintReservedTokens(overflowAmount);
+      assert.fail();
+    }
+    catch(e) {
+      assert.match(e.message, /invalid opcode/);
+    }
+  });
 });

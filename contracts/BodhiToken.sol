@@ -79,7 +79,7 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = add(totalSupply, _amount);
-    require(checkedSupply < tokenTotalSupply);
+    require(checkedSupply <= tokenTotalSupply);
 
     mint(wallet, _amount);
   }
