@@ -272,4 +272,10 @@ contract('BodhiToken', function(accounts) {
       }
     });
   });
+
+  it('should return the totalSupply', async () => {
+    let token = await BodhiToken.deployed();
+    let totalSupply = await token.totalSupply();
+    assert.equal(totalSupply.toNumber(), config.presaleAmount);
+  });
 });
