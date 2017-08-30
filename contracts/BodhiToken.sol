@@ -13,8 +13,8 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
   // Crowdsale parameters
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
-  uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
-  uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
+  uint256 public constant saleAmount = 60000000 ether; // 60 million BOT tokens for sale
+  uint256 public constant tokenTotalSupply = 100000000 ether; // 100 million BOT tokens will ever be created
   uint256 public decayPeriod; // decay 10% per `decayPeriod` blocks
   uint256 public initialExchangeRate;
 
