@@ -70,8 +70,8 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     uint256 tokenAmount = exchangeTokenAmount(msg.value);
     uint256 checkedSupply = add(totalSupply, tokenAmount);
 
-    // Ensure new token increment does not exceed the total supply
-    assert(checkedSupply <= tokenTotalSupply);
+    // Ensure new token increment does not exceed the sale amount
+    assert(checkedSupply <= saleAmount);
 
     mint(msg.sender, tokenAmount);
     forwardFunds();
