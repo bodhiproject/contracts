@@ -2,9 +2,8 @@ pragma solidity ^0.4.10;
 
 import './StandardToken.sol';
 import './Ownable.sol';
-import './SafeMath.sol';
 
-contract BodhiToken is StandardToken, SafeMath, Ownable {
+contract BodhiToken is StandardToken, Ownable {
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
@@ -24,11 +23,11 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
 
   // Constructor
   function BodhiToken(
-    uint256 _fundingStartBlock, 
-    uint256 _fundingEndBlock, 
-    uint256 _initialExchangeRate, 
+    uint256 _fundingStartBlock,
+    uint256 _fundingEndBlock,
+    uint256 _initialExchangeRate,
     uint256 _decayPeriod,
-    uint256 _presaleAmount, 
+    uint256 _presaleAmount,
     address _wallet) {
 
     require(_fundingStartBlock >= block.number);
@@ -46,7 +45,7 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     decayPeriod = _decayPeriod;
 
     // Mint the presale tokens, distribute to a receiver
-    // Increase the totalSupply accordinglly 
+    // Increase the totalSupply accordinglly
     mint(wallet, _presaleAmount);
   }
 
@@ -58,7 +57,7 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
 
     uint256 rate = initialExchangeRate * decayFactor / 1000;
 
-    return mul(rate, weiAmount);
+    return rate.mul(weiAmount);
   }
 
   // Fallback function to accept QTUM during token sale
@@ -68,17 +67,17 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
     require(msg.value > 0);
 
     uint256 tokenAmount = exchangeTokenAmount(msg.value);
-    uint256 checkedSupply = add(totalSupply, tokenAmount);
+    uint256 checkedSupply = totalSupply.add(tokenAmount);
 
-    // Ensure new token increment does not exceed the total supply
-    assert(checkedSupply <= tokenTotalSupply);
+    // Ensure new token increment does not exceed the sale amount
+    assert(checkedSupply <= saleAmount);
 
     mint(msg.sender, tokenAmount);
     forwardFunds();
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
-    uint256 checkedSupply = add(totalSupply, _amount);
+    uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
 
     mint(wallet, _amount);
@@ -94,7 +93,7 @@ contract BodhiToken is StandardToken, SafeMath, Ownable {
    */
   function mint(address _to, uint256 _amount) internal returns (bool) {
     totalSupply += _amount;
-    balances[_to] = add(balances[_to], _amount);
+    balances[_to] = balances[_to].add(_amount);
     Mint(totalSupply, _to, _amount);
     return true;
   }

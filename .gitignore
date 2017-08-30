@@ -2,3 +2,6 @@
 build/*
 
 node_modules/*
+.idea/
+contracts.iml
+package-lock.json
