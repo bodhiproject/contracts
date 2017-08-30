@@ -20,7 +20,7 @@ contract('BodhiToken', function(accounts) {
 
     let balanceInEther = web3.fromWei(balance);
     // Set during the initialization, see "migrations/2_deploy_contracts.js"
-    let expectedBalanceInEther = web3.toBigNumber(20e6);
+    let expectedBalanceInEther = web3.toBigNumber(29442955);
     assert(balanceInEther.eq(expectedBalanceInEther), "wallet should have received presale token");
 
     // Assert the supply is updated
@@ -106,7 +106,7 @@ contract('BodhiToken', function(accounts) {
 
       let balance = await token.balanceOf(from);
 
-      assert.equal(balance.toNumber(), web3.toWei(100));
+      assert.equal(balance.toNumber(), web3.toWei(36));
     });
 
     it('reject zero value purchase', async () => {
@@ -238,11 +238,11 @@ contract('BodhiToken', function(accounts) {
 
       await blockHeightManager.mineTo(config.startBlock);
       let startingExchangeRate = await token.exchangeTokenAmount(1);
-      assert.equal(startingExchangeRate.toNumber(), 100);
+      assert.equal(startingExchangeRate.toNumber(), 36);
 
       await blockHeightManager.mineTo(config.startBlock + config.decayPeriod + 1)
       let firstDecayExchangeRate = await token.exchangeTokenAmount(1);
-      assert.equal(firstDecayExchangeRate.toNumber(), 90);
+      assert.equal(firstDecayExchangeRate.toNumber(), 32);
     });
 
     it('should forbid invalid rate for the exchange rate', async () => {
