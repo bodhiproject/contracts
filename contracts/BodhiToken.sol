@@ -12,7 +12,7 @@ contract BodhiToken is StandardToken, Ownable {
   // Crowdsale parameters
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
-  uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
+  uint256 public constant maxTokenForSale = 60e6 ether; // 60 million BOT tokens for sale
   uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
   uint256 public initialExchangeRate;
 
@@ -31,7 +31,7 @@ contract BodhiToken is StandardToken, Ownable {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_wallet != address(0));
-    require(_presaleAmount <= saleAmount);
+    require(_presaleAmount <= maxTokenForSale);
     require(_initialExchangeRate > 0);
 
     fundingStartBlock = _fundingStartBlock;
@@ -58,7 +58,7 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
-    assert(checkedSupply <= saleAmount);
+    assert(checkedSupply <= maxTokenForSale);
 
     mint(msg.sender, tokenAmount);
     forwardFunds();
