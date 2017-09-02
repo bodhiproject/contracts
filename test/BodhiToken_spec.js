@@ -33,10 +33,15 @@ contract('BodhiToken', function(accounts) {
     let token = await BodhiToken.deployed();
 
     let fundingStartBlock = await token.fundingStartBlock();
-    let fundingEndBlock = await token.fundingEndBlock();
+    assert.equal(fundingStartBlock, config.startBlock, "Funding start block does not match.");
 
-    assert(fundingStartBlock > 0);
-    assert(fundingEndBlock > fundingStartBlock);
+    let fundingEndBlock = await token.fundingEndBlock();
+    assert.equal(fundingEndBlock, config.endBlock, "Funding end block does not match.");
+
+    assert(fundingEndBlock > fundingStartBlock, "Funding end block is before funding start block.");
+    assert.equal(await token.initialExchangeRate(), config.initialExchangeRate, "Initial exchange rate does not match.");
+
+    assert.equal(await token.saleAmount(), web3.toBigNumber(60e6), "Sale amount does not match.");
   });
 
   describe('exchange open period', () => {
