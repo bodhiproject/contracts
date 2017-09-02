@@ -41,7 +41,13 @@ contract('BodhiToken', function(accounts) {
     assert(fundingEndBlock > fundingStartBlock, "Funding end block is before funding start block.");
     assert.equal(await token.initialExchangeRate(), config.initialExchangeRate, "Initial exchange rate does not match.");
 
-    assert.equal(await token.saleAmount(), web3.toBigNumber(60e6), "Sale amount does not match.");
+    let saleAmount = web3.toBigNumber(await token.saleAmount());
+    let expectedSaleAmount = web3.toBigNumber(web3.toWei(60e6, "ether"));
+    assert.equal(saleAmount.toString(), expectedSaleAmount.toString(), "Sale amount does not match.");
+
+    let totalSupply = web3.toBigNumber(await token.totalSupply());
+    let expectedTotalSupply = web3.toBigNumber(web3.toWei(100e6, "ether"));
+    assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "Total supply does not match.");
   });
 
   describe('exchange open period', () => {
