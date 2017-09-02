@@ -56,9 +56,11 @@ contract BodhiToken is StandardToken, Ownable {
 
   // Fallback function to accept QTUM during token sale
   function () external payable {
-    require(block.number >= fundingStartBlock);
-    require(block.number <= fundingEndBlock);
-    require(msg.value > 0);
+    buyTokens(msg.sender);
+  }
+
+  function buyTokens(address _beneficiary) payable validAddress(_beneficiary) {
+    require(isValidPurchase());
 
     uint256 tokenAmount = exchangeTokenAmount(msg.value);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
@@ -68,10 +70,6 @@ contract BodhiToken is StandardToken, Ownable {
 
     mint(msg.sender, tokenAmount);
     forwardFunds();
-  }
-
-  function buyTokens(address _beneficiary) payable validAddress(_beneficiary) {
-    
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
@@ -98,7 +96,7 @@ contract BodhiToken is StandardToken, Ownable {
 
   function isValidPurchase() internal constant returns (bool) {
     bool isValidBlock = block.number >= fundingStartBlock && block.number <= fundingEndBlock;
-    bool isNonZeroPurchase = msg.value != 0;
+    bool isNonZeroPurchase = msg.value > 0;
     return isValidBlock && isNonZeroPurchase;
   }
 }
