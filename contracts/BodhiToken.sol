@@ -9,13 +9,14 @@ contract BodhiToken is StandardToken, Ownable {
   string public constant symbol = "BOT";
   uint256 public constant decimals = 18;
 
+  // Token constants
+  uint256 public constant MAX_TOKENS_FOR_SALE = 60e6 ether; // 60 million BOT tokens for sale
+  uint256 public constant MAX_TOKEN_SUPPLY = 100e6 ether; // 100 million BOT tokens will ever be created
+
   // Crowdsale parameters
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
-  uint256 public constant maxTokenForSale = 60e6 ether; // 60 million BOT tokens for sale
-  uint256 public constant maxTokenSupply = 100e6 ether; // 100 million BOT tokens will ever be created
   uint256 public initialExchangeRate;
-
   address public wallet;
 
   event Mint(uint256 supply, address indexed to, uint256 amount);
@@ -31,7 +32,7 @@ contract BodhiToken is StandardToken, Ownable {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_wallet != address(0));
-    require(_presaleAmount <= maxTokenForSale);
+    require(_presaleAmount <= MAX_TOKENS_FOR_SALE);
     require(_initialExchangeRate > 0);
 
     fundingStartBlock = _fundingStartBlock;
@@ -58,7 +59,7 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
-    assert(checkedSupply <= maxTokenForSale);
+    assert(checkedSupply <= MAX_TOKENS_FOR_SALE);
 
     mint(msg.sender, tokenAmount);
     forwardFunds();
@@ -66,7 +67,7 @@ contract BodhiToken is StandardToken, Ownable {
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
-    require(checkedSupply <= maxTokenSupply);
+    require(checkedSupply <= MAX_TOKEN_SUPPLY);
 
     mint(wallet, _amount);
   }
