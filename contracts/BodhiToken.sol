@@ -13,7 +13,7 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
   uint256 public constant maxTokenForSale = 60e6 ether; // 60 million BOT tokens for sale
-  uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
+  uint256 public constant maxTokenSupply = 100e6 ether; // 100 million BOT tokens will ever be created
   uint256 public initialExchangeRate;
 
   address public wallet;
@@ -66,7 +66,7 @@ contract BodhiToken is StandardToken, Ownable {
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
-    require(checkedSupply <= tokenTotalSupply);
+    require(checkedSupply <= maxTokenSupply);
 
     mint(wallet, _amount);
   }
