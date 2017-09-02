@@ -10,8 +10,8 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public constant decimals = 18;
 
   // Token constants
-  uint256 public constant MAX_TOKENS_FOR_SALE = 60 * (10**6) * (10**decimals); // 60 million BOT tokens for sale
-  uint256 public constant MAX_TOKEN_SUPPLY = 100 * (10**6) * (10**decimals); // 100 million BOT tokens will ever be created
+  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals); // 60 million BOT tokens for sale
+  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT tokens will ever be created
 
   // Crowdsale parameters
   uint256 public fundingStartBlock;
@@ -41,12 +41,11 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 _fundingEndBlock,
     uint256 _initialExchangeRate,
     uint256 _presaleAmount,
-    address _wallet) 
-  {
+    address _wallet) {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_initialExchangeRate > 0);
-    require(_presaleAmount <= MAX_TOKENS_FOR_SALE);
+    require(_presaleAmount <= saleAmount);
     require(_wallet != address(0));
 
     fundingStartBlock = _fundingStartBlock;
@@ -71,13 +70,12 @@ contract BodhiToken is StandardToken, Ownable {
   function buyTokens(address _beneficiary) 
     payable 
     validAddress(_beneficiary) 
-    validPurchase 
-  {
+    validPurchase {
     uint256 tokenAmount = exchangeTokenAmount(msg.value);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
-    assert(checkedSupply <= MAX_TOKENS_FOR_SALE);
+    assert(checkedSupply <= saleAmount);
 
     mint(msg.sender, tokenAmount);
     TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
@@ -87,7 +85,7 @@ contract BodhiToken is StandardToken, Ownable {
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
-    require(checkedSupply <= MAX_TOKEN_SUPPLY);
+    require(checkedSupply <= tokenTotalSupply);
 
     mint(wallet, _amount);
   }
