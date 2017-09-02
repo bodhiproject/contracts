@@ -10,8 +10,8 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public constant decimals = 18;
 
   // Token constants
-  uint256 public constant MAX_TOKENS_FOR_SALE = 60e6 ether; // 60 million BOT tokens for sale
-  uint256 public constant MAX_TOKEN_SUPPLY = 100e6 ether; // 100 million BOT tokens will ever be created
+  uint256 public constant MAX_TOKENS_FOR_SALE = 60 * (10**6) * (10**decimals); // 60 million BOT tokens for sale
+  uint256 public constant MAX_TOKEN_SUPPLY = 100 * (10**6) * (10**decimals); // 100 million BOT tokens will ever be created
 
   // Crowdsale parameters
   uint256 public fundingStartBlock;
