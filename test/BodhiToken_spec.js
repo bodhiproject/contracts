@@ -25,11 +25,11 @@ contract('BodhiToken', function(accounts) {
       assert(fundingEndBlock > fundingStartBlock, "Funding end block is before funding start block.");
       assert.equal(await token.initialExchangeRate(), config.initialExchangeRate, "Initial exchange rate does not match.");
 
-      let maxTokenForSale = web3.toBigNumber(await token.MAX_TOKENS_FOR_SALE());
+      let maxTokenForSale = web3.toBigNumber(await token.saleAmount());
       let expectedSaleAmount = web3.toBigNumber(web3.toWei(60e6, "ether"));
       assert.equal(maxTokenForSale.toString(), expectedSaleAmount.toString(), "Sale amount does not match.");
 
-      let totalSupply = web3.toBigNumber(await token.MAX_TOKEN_SUPPLY());
+      let totalSupply = web3.toBigNumber(await token.tokenTotalSupply());
       let expectedTotalSupply = web3.toBigNumber(web3.toWei(100e6, "ether"));
       assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "Total token supply does not match.");
     });
@@ -243,7 +243,7 @@ contract('BodhiToken', function(accounts) {
     let token = await BodhiToken.deployed();
     let totalSupply = await token.totalSupply();
     let wallet = await token.wallet();
-    let maxTokenSupply = await token.MAX_TOKEN_SUPPLY();
+    let maxTokenSupply = await token.tokenTotalSupply();
 
     let balanceBefore = await token.balanceOf(wallet);
     let residualTokens = maxTokenSupply.sub(totalSupply);
@@ -262,7 +262,7 @@ contract('BodhiToken', function(accounts) {
     let token = await BodhiToken.deployed();
     let totalSupply = await token.totalSupply();
     let wallet = await token.wallet();
-    let maxTokenSupply = await token.MAX_TOKEN_SUPPLY();
+    let maxTokenSupply = await token.tokenTotalSupply();
 
     let balanceBefore = await token.balanceOf(wallet);
     // One more BOT above the limit
