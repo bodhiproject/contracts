@@ -9,13 +9,14 @@ contract BodhiToken is StandardToken, Ownable {
   string public constant symbol = "BOT";
   uint256 public constant decimals = 18;
 
+  // Token constants
+  uint256 public constant MAX_TOKENS_FOR_SALE = 60 * (10**6) * (10**decimals); // 60 million BOT tokens for sale
+  uint256 public constant MAX_TOKEN_SUPPLY = 100 * (10**6) * (10**decimals); // 100 million BOT tokens will ever be created
+
   // Crowdsale parameters
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
-  uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
-  uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
   uint256 public initialExchangeRate;
-
   address public wallet;
 
   event Mint(uint256 supply, address indexed to, uint256 amount);
@@ -26,18 +27,18 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 _fundingEndBlock,
     uint256 _initialExchangeRate,
     uint256 _presaleAmount,
-    address _wallet) {
-
+    address _wallet) 
+  {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
-    require(_wallet != address(0));
-    require(_presaleAmount <= saleAmount);
     require(_initialExchangeRate > 0);
+    require(_presaleAmount <= MAX_TOKENS_FOR_SALE);
+    require(_wallet != address(0));
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
-    wallet = _wallet;
     initialExchangeRate = _initialExchangeRate;
+    wallet = _wallet;
 
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordinglly
@@ -58,7 +59,7 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
-    assert(checkedSupply <= saleAmount);
+    assert(checkedSupply <= MAX_TOKENS_FOR_SALE);
 
     mint(msg.sender, tokenAmount);
     forwardFunds();
@@ -66,7 +67,7 @@ contract BodhiToken is StandardToken, Ownable {
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
-    require(checkedSupply <= tokenTotalSupply);
+    require(checkedSupply <= MAX_TOKEN_SUPPLY);
 
     mint(wallet, _amount);
   }

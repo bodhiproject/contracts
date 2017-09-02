@@ -6,7 +6,7 @@ function Config(web3) {
     endBlock: 60,
     initialExchangeRate: 100,
     presaleAmount: web3.toWei(20e6),
-   // wallet: await bluebird.promisify(web3.eth.getCoinbase)()
+    // wallet: await bluebird.promisify(web3.eth.getCoinbase)()
   }
 };
 

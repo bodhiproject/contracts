@@ -1,6 +1,5 @@
 pragma solidity ^0.4.11;
 
-
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -8,7 +7,7 @@ pragma solidity ^0.4.11;
  */
 contract ERC20Basic {
   uint256 public totalSupply;
-  function balanceOf(address who) constant returns (uint256);
-  function transfer(address to, uint256 value) returns (bool);
-  event Transfer(address indexed from, address indexed to, uint256 value);
+  function balanceOf(address _owner) constant returns (uint256 balance);
+  function transfer(address _to, uint256 _value) returns (bool success);
+  event Transfer(address indexed _from, address indexed _to, uint256 _value);
 }

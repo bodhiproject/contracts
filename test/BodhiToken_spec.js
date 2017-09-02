@@ -12,31 +12,40 @@ contract('BodhiToken', function(accounts) {
   before(blockHeightManager.snapshot);
   afterEach(blockHeightManager.revert);
 
-  it("should mint presale token and allocate to the wallet", async function() {
-    let token = await BodhiToken.deployed();
+  describe("Initialization", () => {
+    it('initializes all the values', async () => {
+      let token = await BodhiToken.deployed();
 
-    // Assert the presale allocation
-    let balance = await token.balanceOf.call('0x12345');
+      let fundingStartBlock = await token.fundingStartBlock();
+      assert.equal(fundingStartBlock, config.startBlock, "Funding start block does not match.");
 
-    let balanceInEther = web3.fromWei(balance);
-    // Set during the initialization, see "migrations/2_deploy_contracts.js"
-    let expectedBalanceInEther = web3.toBigNumber(20e6);
-    assert(balanceInEther.eq(expectedBalanceInEther), "wallet should have received presale token");
+      let fundingEndBlock = await token.fundingEndBlock();
+      assert.equal(fundingEndBlock, config.endBlock, "Funding end block does not match.");
 
-    // Assert the supply is updated
-    let totalSupply = await token.totalSupply();
-    let fundingStartBlock = await token.fundingStartBlock();
-    console.log(totalSupply, fundingStartBlock);
-  });
+      assert(fundingEndBlock > fundingStartBlock, "Funding end block is before funding start block.");
+      assert.equal(await token.initialExchangeRate(), config.initialExchangeRate, "Initial exchange rate does not match.");
 
-  it('initialized correctly', async () => {
-    let token = await BodhiToken.deployed();
+      let maxTokenForSale = web3.toBigNumber(await token.MAX_TOKENS_FOR_SALE());
+      let expectedSaleAmount = web3.toBigNumber(web3.toWei(60e6, "ether"));
+      assert.equal(maxTokenForSale.toString(), expectedSaleAmount.toString(), "Sale amount does not match.");
 
-    let fundingStartBlock = await token.fundingStartBlock();
-    let fundingEndBlock = await token.fundingEndBlock();
+      let totalSupply = web3.toBigNumber(await token.MAX_TOKEN_SUPPLY());
+      let expectedTotalSupply = web3.toBigNumber(web3.toWei(100e6, "ether"));
+      assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "Total token supply does not match.");
+    });
 
-    assert(fundingStartBlock > 0);
-    assert(fundingEndBlock > fundingStartBlock);
+    it("should mint presale token and allocate to the wallet", async function() {
+      let token = await BodhiToken.deployed();
+
+      // Assert the presale allocation
+      let walletBalance = await token.balanceOf.call('0x12345');
+      let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount);
+      assert.equal(walletBalance.toString(), expectedPresaleAmount.toString(), "Wallet balance does not match presale amount.");
+
+      // Assert the supply is updated
+      let totalSupply = await token.totalSupply();
+      assert.equal(totalSupply.toString(), expectedPresaleAmount.toString(), "Total supply does not match the presale amount.");
+    });
   });
 
   describe('exchange open period', () => {
@@ -234,10 +243,10 @@ contract('BodhiToken', function(accounts) {
     let token = await BodhiToken.deployed();
     let totalSupply = await token.totalSupply();
     let wallet = await token.wallet();
-    let tokenTotalSupply = await token.tokenTotalSupply();
+    let maxTokenSupply = await token.MAX_TOKEN_SUPPLY();
 
     let balanceBefore = await token.balanceOf(wallet);
-    let residualTokens = tokenTotalSupply.sub(totalSupply);
+    let residualTokens = maxTokenSupply.sub(totalSupply);
 
     await token.mintReservedTokens(residualTokens);
 
@@ -253,11 +262,11 @@ contract('BodhiToken', function(accounts) {
     let token = await BodhiToken.deployed();
     let totalSupply = await token.totalSupply();
     let wallet = await token.wallet();
-    let tokenTotalSupply = await token.tokenTotalSupply();
+    let maxTokenSupply = await token.MAX_TOKEN_SUPPLY();
 
     let balanceBefore = await token.balanceOf(wallet);
     // One more BOT above the limit
-    let overflowAmount = tokenTotalSupply.sub(totalSupply).add(1);
+    let overflowAmount = maxTokenSupply.sub(totalSupply).add(1);
 
     try {
       await token.mintReservedTokens(overflowAmount);
