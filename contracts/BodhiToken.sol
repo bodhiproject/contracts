@@ -51,7 +51,7 @@ contract BodhiToken is StandardToken, Ownable {
     mint(wallet, _presaleAmount);
   }
 
-  function exchangeTokenAmount(uint256 weiAmount) constant returns(uint256) {
+  function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
     return initialExchangeRate.mul(weiAmount);
   }
 
