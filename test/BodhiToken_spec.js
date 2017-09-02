@@ -13,7 +13,7 @@ contract('BodhiToken', function(accounts) {
   afterEach(blockHeightManager.revert);
 
   describe("Initialization", () => {
-    it('initialized correctly', async () => {
+    it('initializes all the values', async () => {
       let token = await BodhiToken.deployed();
 
       let fundingStartBlock = await token.fundingStartBlock();
@@ -38,17 +38,13 @@ contract('BodhiToken', function(accounts) {
       let token = await BodhiToken.deployed();
 
       // Assert the presale allocation
-      let balance = await token.balanceOf.call('0x12345');
-
-      let balanceInEther = web3.fromWei(balance);
-      // Set during the initialization, see "migrations/2_deploy_contracts.js"
-      let expectedBalanceInEther = web3.toBigNumber(20e6);
-      assert(balanceInEther.eq(expectedBalanceInEther), "wallet should have received presale token");
+      let walletBalance = await token.balanceOf.call('0x12345');
+      let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount);
+      assert.equal(walletBalance.toString(), expectedPresaleAmount.toString(), "Wallet balance does not match presale amount.");
 
       // Assert the supply is updated
       let totalSupply = await token.totalSupply();
-      let fundingStartBlock = await token.fundingStartBlock();
-      console.log(totalSupply, fundingStartBlock);
+      assert.equal(totalSupply.toString(), expectedPresaleAmount.toString(), "Total supply does not match the presale amount.");
     });
   });
 
