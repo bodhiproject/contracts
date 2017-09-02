@@ -27,18 +27,18 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 _fundingEndBlock,
     uint256 _initialExchangeRate,
     uint256 _presaleAmount,
-    address _wallet) {
-
+    address _wallet) 
+  {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
-    require(_wallet != address(0));
-    require(_presaleAmount <= MAX_TOKENS_FOR_SALE);
     require(_initialExchangeRate > 0);
+    require(_presaleAmount <= MAX_TOKENS_FOR_SALE);
+    require(_wallet != address(0));
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
-    wallet = _wallet;
     initialExchangeRate = _initialExchangeRate;
+    wallet = _wallet;
 
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordinglly
