@@ -20,6 +20,12 @@ contract BodhiToken is StandardToken, Ownable {
 
   event Mint(uint256 supply, address indexed to, uint256 amount);
 
+  // Modifiers
+  modifier validAddress(address _address) {
+    require(_address != 0x0);
+    _;
+  }
+
   // Constructor
   function BodhiToken(
     uint256 _fundingStartBlock,
@@ -49,7 +55,7 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   // Fallback function to accept QTUM during token sale
-  function () payable external {
+  function () external payable {
     require(block.number >= fundingStartBlock);
     require(block.number <= fundingEndBlock);
     require(msg.value > 0);
@@ -62,6 +68,10 @@ contract BodhiToken is StandardToken, Ownable {
 
     mint(msg.sender, tokenAmount);
     forwardFunds();
+  }
+
+  function buyTokens(address _beneficiary) payable validAddress(_beneficiary) {
+
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
