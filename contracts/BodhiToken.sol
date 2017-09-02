@@ -14,7 +14,6 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public fundingEndBlock;
   uint256 public constant saleAmount = 60e6 ether; // 60 million BOT tokens for sale
   uint256 public constant tokenTotalSupply = 100e6 ether; // 100 million BOT tokens will ever be created
-  uint256 public decayPeriod; // decay 10% per `decayPeriod` blocks
   uint256 public initialExchangeRate;
 
   address public wallet;
@@ -26,7 +25,6 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 _fundingStartBlock,
     uint256 _fundingEndBlock,
     uint256 _initialExchangeRate,
-    uint256 _decayPeriod,
     uint256 _presaleAmount,
     address _wallet) {
 
@@ -35,14 +33,11 @@ contract BodhiToken is StandardToken, Ownable {
     require(_wallet != address(0));
     require(_presaleAmount <= saleAmount);
     require(_initialExchangeRate > 0);
-    // decayPeriod must be positive and less than the open period
-    require(_decayPeriod > 0 && _decayPeriod <= (_fundingEndBlock - _fundingStartBlock));
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
     wallet = _wallet;
     initialExchangeRate = _initialExchangeRate;
-    decayPeriod = _decayPeriod;
 
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordinglly
@@ -50,14 +45,7 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   function exchangeTokenAmount(uint256 weiAmount) constant returns(uint256) {
-    // Token amount decay 10% every 1000 blocks
-    // `decayFactor` is in 0.1%
-    uint256 decayFactor = 1000 - (block.number - fundingStartBlock) / decayPeriod * 100;
-    assert(decayFactor >= 0 && decayFactor <= 1000);
-
-    uint256 rate = initialExchangeRate * decayFactor / 1000;
-
-    return rate.mul(weiAmount);
+    return initialExchangeRate.mul(weiAmount);
   }
 
   // Fallback function to accept QTUM during token sale

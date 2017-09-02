@@ -194,44 +194,7 @@ contract('BodhiToken', function(accounts) {
     });
   });
 
-  describe('decayPeriod', () => {
-
-    it('should be positive', async () => {
-      try {
-        let token = await BodhiToken.new(
-          10,
-          50,
-          10,
-          -10, // negative decayPeriod is forbidden
-          20,
-          accounts[1]
-        );
-
-        assert.fail();
-      }
-      catch(e) {
-        assert.match(e.message, /invalid opcode/);
-      }
-    });
-
-
-    it('should less than the open period', async () => {
-      try {
-        let token = await BodhiToken.new(
-          10,
-          50,
-          10,
-          100, // 100 > 50(endBlock) - 10(startBlock)
-          20,
-          accounts[1]
-        );
-
-        assert.fail();
-      }
-      catch(e) {
-        assert.match(e.message, /invalid opcode/);
-      }
-    });
+  describe('exchange', () => {
 
     it('should return the correct exchange rate', async() => {
       let token = await BodhiToken.deployed();
@@ -240,21 +203,9 @@ contract('BodhiToken', function(accounts) {
       let startingExchangeRate = await token.exchangeTokenAmount(1);
       assert.equal(startingExchangeRate.toNumber(), 100);
 
-      await blockHeightManager.mineTo(config.startBlock + config.decayPeriod + 1)
+      await blockHeightManager.mineTo(config.startBlock + 1)
       let firstDecayExchangeRate = await token.exchangeTokenAmount(1);
-      assert.equal(firstDecayExchangeRate.toNumber(), 90);
-    });
-
-    it('should forbid invalid rate for the exchange rate', async () => {
-      let token = await BodhiToken.deployed();
-
-      try {
-        let rate = await token.exchangeTokenAmount(1);
-        assert.fail();
-      }
-      catch(e) {
-        assert.match(e.message, /invalid opcode/);
-      }
+      assert.equal(firstDecayExchangeRate.toNumber(), 100);
     });
 
     it('should forbid negative for the exchange rate', async () => {
