@@ -20,6 +20,20 @@ contract BodhiToken is StandardToken, Ownable {
   address public wallet;
 
   event Mint(uint256 supply, address indexed to, uint256 amount);
+  event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+
+  // Modifiers
+  modifier validAddress(address _address) {
+    require(_address != 0x0);
+    _;
+  }
+
+  modifier validPurchase() {
+    require(block.number >= fundingStartBlock);
+    require(block.number <= fundingEndBlock);
+    require(msg.value > 0);
+    _;
+  }
 
   // Constructor
   function BodhiToken(
@@ -45,16 +59,20 @@ contract BodhiToken is StandardToken, Ownable {
     mint(wallet, _presaleAmount);
   }
 
-  function exchangeTokenAmount(uint256 weiAmount) constant returns(uint256) {
-    return initialExchangeRate.mul(weiAmount);
+  function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
+    return initialExchangeRate.mul(_weiAmount);
   }
 
   // Fallback function to accept QTUM during token sale
-  function () payable external {
-    require(block.number >= fundingStartBlock);
-    require(block.number <= fundingEndBlock);
-    require(msg.value > 0);
+  function () external payable {
+    buyTokens(msg.sender);
+  }
 
+  function buyTokens(address _beneficiary) 
+    payable 
+    validAddress(_beneficiary) 
+    validPurchase 
+  {
     uint256 tokenAmount = exchangeTokenAmount(msg.value);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
@@ -62,6 +80,8 @@ contract BodhiToken is StandardToken, Ownable {
     assert(checkedSupply <= MAX_TOKENS_FOR_SALE);
 
     mint(msg.sender, tokenAmount);
+    TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
+
     forwardFunds();
   }
 
