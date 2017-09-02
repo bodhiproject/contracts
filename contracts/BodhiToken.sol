@@ -71,7 +71,7 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   function buyTokens(address _beneficiary) payable validAddress(_beneficiary) {
-
+    
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
@@ -94,5 +94,11 @@ contract BodhiToken is StandardToken, Ownable {
     balances[_to] = balances[_to].add(_amount);
     Mint(totalSupply, _to, _amount);
     return true;
+  }
+
+  function isValidPurchase() internal constant returns (bool) {
+    bool isValidBlock = block.number >= fundingStartBlock && block.number <= fundingEndBlock;
+    bool isNonZeroPurchase = msg.value != 0;
+    return isValidBlock && isNonZeroPurchase;
   }
 }
