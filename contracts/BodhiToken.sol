@@ -19,6 +19,7 @@ contract BodhiToken is StandardToken, Ownable {
   address public wallet;
 
   event Mint(uint256 supply, address indexed to, uint256 amount);
+  event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
   // Modifiers
   modifier validAddress(address _address) {
@@ -69,6 +70,8 @@ contract BodhiToken is StandardToken, Ownable {
     assert(checkedSupply <= saleAmount);
 
     mint(msg.sender, tokenAmount);
+    TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
+
     forwardFunds();
   }
 
