@@ -64,6 +64,25 @@ contract('BodhiToken', function(accounts) {
       let actualMintSupply = web3.toBigNumber(await token.totalSupply());
       let expectedTotalSupply = initialSupply.add(mintedTokenAmount);
       assert.equal(actualMintSupply.toString(), expectedTotalSupply.toString(), "Expected total supply does not match.");
+    });
+
+    it('does not allow an address other than the owner to mint reserved tokens', async () => {
+      let token = await BodhiToken.deployed();
+
+      let initialSupply = web3.toBigNumber(await token.totalSupply());
+      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      assert.equal(initialSupply.toString(), presaleAmount.toString());
+
+      try {
+        let mintedTokenAmount = web3.toBigNumber(10e6);
+        await token.mintReservedTokens(mintedTokenAmount, {from: accounts[1]});
+        assert.fail();
+      } catch(e) {
+        assert.match(e.toString(), /invalid opcode/);
+      }
+
+      let actualMintSupply = web3.toBigNumber(await token.totalSupply());
+      assert.equal(actualMintSupply.toString(), initialSupply.toString(), "Expected total supply does not match.");
     })
   });
 
