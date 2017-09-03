@@ -266,7 +266,7 @@ contract('BodhiToken', function(accounts) {
       assert.equal(purchaserBalance.toNumber(), 0, "Purchaser balance should be 0.");
 
       let beneficiaryBalance = await token.balanceOf(beneficiary);
-      let expectedBeneficiaryBalance = await token.exchangeTokenAmount(value);
+      let expectedBeneficiaryBalance = await token.getTokenExchangeAmount(value);
       assert.equal(beneficiaryBalance.toNumber(), expectedBeneficiaryBalance, "Beneficiary balance does not match.");
     });
 
@@ -281,7 +281,7 @@ contract('BodhiToken', function(accounts) {
       await token.buyTokens(beneficiary, {from: purchaser, value: value});
 
       let balance = await token.balanceOf(purchaser);
-      let expectedBalance = await token.exchangeTokenAmount(value);
+      let expectedBalance = await token.getTokenExchangeAmount(value);
       assert.equal(balance.toString(), expectedBalance.toString(), "Balance does not match.");
     });
 
@@ -377,10 +377,12 @@ contract('BodhiToken', function(accounts) {
 
       await blockHeightManager.mineTo(config.startBlock);
       
-      let numOfTokensToExchange = 1;
-      let exchangeRate = (await token.initialExchangeRate()).toNumber();
-      let expectedBotTokens = numOfTokensToExchange * exchangeRate;
-      assert.equal(expectedBotTokens, 100, "Exchange rate does not match.");
+      let weiToExchange = web3.toWei(1);
+      let actualAmount = await token.getTokenExchangeAmount(weiToExchange);
+
+      let exchangeRate = await token.initialExchangeRate();
+      let expectedAmount = web3.toBigNumber(weiToExchange) * exchangeRate;
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
     });
 
     it('should forbid negative for the exchange rate', async () => {
@@ -389,7 +391,7 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(config.startBlock);
 
       try {
-        let rate = await token.exchangeTokenAmount(-1);
+        let rate = await token.getTokenExchangeAmount(-1);
         assert.fail();
       } catch(e) {
         assert.match(e.message, /invalid opcode/);
