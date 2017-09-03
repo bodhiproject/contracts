@@ -56,7 +56,6 @@ contract('BodhiToken', function(accounts) {
       assert(await requester.getBlockNumberAsync() < config.startBlock, 
         'current block height should less than start block height');;
 
-
       let from = accounts[1]; // Using the second account to purchase BOT
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
 
@@ -78,7 +77,6 @@ contract('BodhiToken', function(accounts) {
       let token = await BodhiToken.deployed();
 
       await blockHeightManager.mineTo(config.endBlock + 10);
-
       assert.isAtLeast(await requester.getBlockNumberAsync(), config.endBlock);
 
       let from = accounts[1]; // Using the second account to purchase BOT
@@ -101,9 +99,7 @@ contract('BodhiToken', function(accounts) {
       let token = await BodhiToken.deployed();
 
       let destBlock = parseInt((config.startBlock + config.endBlock) / 2);
-
       await blockHeightManager.mineTo(destBlock);
-
 
       let from = accounts[1]; // Using the second account to purchase BOT
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
@@ -125,8 +121,6 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo((config.startBlock + config.endBlock) / 2);
 
       let blockNumber = await requester.getBlockNumberAsync();
-
-      // Between the valid period
       assert.isAtMost(blockNumber, config.endBlock);
       assert.isAtLeast(blockNumber, config.startBlock);
 
@@ -174,7 +168,8 @@ contract('BodhiToken', function(accounts) {
       let token = await BodhiToken.deployed();
       let owner = await token.owner();
 
-      let ownerBalance = await requester.getBalanceAsync(owner);
+      var ownerBalance = await requester.getBalanceAsync(owner);
+      assert.equal(ownerBalance, 0, "Owner balance should be 0.");
 
       // Not start yet, it's required to be less than 
       // 5 transactions from now on
@@ -196,14 +191,12 @@ contract('BodhiToken', function(accounts) {
         assert.match(e.message, /invalid opcode/);
       }
 
-
       ownerBalance = await requester.getBalanceAsync(owner);
       assert(ownerBalance.valueOf(), 0);
     });
   });
 
   describe('exchange', () => {
-
     it('should return the correct exchange rate', async() => {
       let token = await BodhiToken.deployed();
 
