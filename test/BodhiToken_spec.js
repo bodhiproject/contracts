@@ -102,6 +102,21 @@ contract('BodhiToken', function(accounts) {
       let expectedTotalSupply = initialSupply.add(mintedTokenAmount);
       assert.equal(actualTotalSupply.toString(), expectedTotalSupply.toString(), "Total supply does not match.");
     });
+
+    it('allows minting if it does not exceed the total token supply', async () => {
+      let token = await BodhiToken.deployed();
+
+      let initialSupply = web3.toBigNumber(await token.totalSupply());
+      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
+
+      let mintedTokenAmount = web3.toBigNumber(80e6);
+      await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
+
+      let actualTotalSupply = web3.toBigNumber(await token.totalSupply());
+      let expectedTotalSupply = initialSupply.add(mintedTokenAmount);
+      assert.equal(actualTotalSupply.toString(), expectedTotalSupply.toString(), "Total supply does not match.");
+    });
   });
 
   describe('Purchasing', () => {
