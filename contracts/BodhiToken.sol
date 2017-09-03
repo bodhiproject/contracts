@@ -70,7 +70,8 @@ contract BodhiToken is StandardToken, Ownable {
   function buyTokens(address _beneficiary) 
     payable 
     validAddress(_beneficiary) 
-    validPurchase {
+    validPurchase
+  {
     uint256 tokenAmount = exchangeTokenAmount(msg.value);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
