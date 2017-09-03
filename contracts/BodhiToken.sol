@@ -72,7 +72,7 @@ contract BodhiToken is StandardToken, Ownable {
     validAddress(_beneficiary) 
     validPurchase
   {
-    uint256 tokenAmount = exchangeTokenAmount(msg.value);
+    uint256 tokenAmount = getTokenExchangeAmount(msg.value);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
@@ -96,7 +96,7 @@ contract BodhiToken is StandardToken, Ownable {
   /// @notice Shows the Ether to BOT exchange rate
   /// @param _weiAmount Ether amount to convert
   /// @return The amount of BOT that will be received
-  function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
+  function getTokenExchangeAmount(uint256 _weiAmount) constant returns(uint256) {
     return initialExchangeRate.mul(_weiAmount);
   }
 
