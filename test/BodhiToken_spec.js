@@ -151,8 +151,7 @@ contract('BodhiToken', function(accounts) {
       try {
         await token.buyTokens(from, {value: value});
         assert.fail();
-      }
-      catch(e) {
+      } catch(e) {
         assert.match(e.toString(), /invalid opcode/);
       }
     });
@@ -274,7 +273,7 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       var purchaser = accounts[1];
-      var value = web3.toWei(40e6);
+      var value = web3.toWei(40);
       await token.buyTokens(purchaser, {from: purchaser, value: value});
 
       totalSupply = web3.toBigNumber(await token.totalSupply());
@@ -282,7 +281,7 @@ contract('BodhiToken', function(accounts) {
       assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should equal sale amount.");
 
       purchaser = accounts[2];
-      value = web3.toWei(1e6);
+      value = web3.toWei(1);
 
       try {
         await token.buyTokens(purchaser, {value: value});
@@ -304,7 +303,7 @@ contract('BodhiToken', function(accounts) {
       var ownerBalance = await requester.getBalanceAsync(owner);
       assert.equal(ownerBalance.valueOf(), 0, "Owner balance should be 0.");
 
-      await blockHeightManager.mineTo(config.startBlock + 1);
+      await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1]; // Using the second account to purchase BOT
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
@@ -341,8 +340,7 @@ contract('BodhiToken', function(accounts) {
         });
 
         assert.fail();
-      } 
-      catch(e) {
+      } catch(e) {
         assert.match(e.message, /invalid opcode/);
       }
 
@@ -356,25 +354,22 @@ contract('BodhiToken', function(accounts) {
       let token = await BodhiToken.deployed();
 
       await blockHeightManager.mineTo(config.startBlock);
-      let startingExchangeRate = await token.exchangeTokenAmount(1);
-      assert.equal(startingExchangeRate.toNumber(), 100);
-
-      await blockHeightManager.mineTo(config.startBlock + 1)
-      let firstDecayExchangeRate = await token.exchangeTokenAmount(1);
-      assert.equal(firstDecayExchangeRate.toNumber(), 100);
+      
+      let numOfTokensToExchange = 1;
+      let exchangeRate = (await token.initialExchangeRate()).toNumber();
+      let expectedBotTokens = numOfTokensToExchange * exchangeRate;
+      assert.equal(expectedBotTokens, 100, "Exchange rate does not match.");
     });
 
     it('should forbid negative for the exchange rate', async () => {
       let token = await BodhiToken.deployed();
 
-      // Good to go
       await blockHeightManager.mineTo(config.startBlock);
 
       try {
         let rate = await token.exchangeTokenAmount(-1);
         assert.fail();
-      }
-      catch(e) {
+      } catch(e) {
         assert.match(e.message, /invalid opcode/);
       }
     });
@@ -418,8 +413,7 @@ contract('BodhiToken', function(accounts) {
     try {
       await token.mintReservedTokens(overflowAmount);
       assert.fail();
-    }
-    catch(e) {
+    } catch(e) {
       assert.match(e.message, /invalid opcode/);
     }
   });
