@@ -35,7 +35,12 @@ contract BodhiToken is StandardToken, Ownable {
     _;
   }
 
-  // Constructor
+  /// @notice Creates new BodhiToken contract
+  /// @param _fundingStartBlock The starting block of crowdsale
+  /// @param _fundingEndBlock The ending block of crowdsale
+  /// @param _initialExchangeRate The exchange rate of Ether to BOT
+  /// @param _presaleAmount The amount of BOT that will be available for presale
+  /// @param _wallet The address where all the funds will be stored
   function BodhiToken(
     uint256 _fundingStartBlock,
     uint256 _fundingEndBlock,
@@ -55,13 +60,13 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _presaleAmount);
   }
 
-  // Fallback function to accept QTUM during token sale
+  /// @notice Fallback function to purchase tokens
   function() external payable {
     buyTokens(msg.sender);
   }
 
-  /// @notice allows buying tokens from different address than msg.sender
-  /// @param _beneficiary address that will contain the purchased BOT tokens
+  /// @notice Allows buying tokens from different address than msg.sender
+  /// @param _beneficiary Address that will contain the purchased tokens
   function buyTokens(address _beneficiary) 
     payable 
     validAddress(_beneficiary) 
@@ -79,6 +84,8 @@ contract BodhiToken is StandardToken, Ownable {
     forwardFunds();
   }
 
+  /// @notice Allows contract owner to mint tokens at any time
+  /// @param _amount Amount of tokens to mint
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
@@ -86,18 +93,22 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _amount);
   }
 
+  /// @notice Shows the Ether to BOT exchange rate
+  /// @param _weiAmount Ether amount to convert
+  /// @return The amount of BOT that will be received
   function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
     return initialExchangeRate.mul(_weiAmount);
   }
 
-  // Send ether to the contract owner
+  /// @dev Sends Ether to the contract owner
   function forwardFunds() internal {
     owner.transfer(msg.value);
   }
 
-   /**
-   * @dev Function to mint tokens
-   */
+  /// @dev Mints new tokens
+  /// @param _to Address to mint the tokens to
+  /// @param _amount Amount of tokens that will be minted
+  /// @return Boolean to signify successful minting
   function mint(address _to, uint256 _amount) internal returns (bool) {
     totalSupply += _amount;
     balances[_to] = balances[_to].add(_amount);
