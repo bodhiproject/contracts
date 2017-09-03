@@ -51,6 +51,21 @@ contract('BodhiToken', function(accounts) {
   });
 
   describe("Minting", () => {
+    it('should be able to mint the reserved portion to the wallet', async() => {
+      let token = await BodhiToken.deployed();
+      let totalSupply = await token.totalSupply();
+      let wallet = await token.wallet();
+      let maxTokenSupply = await token.tokenTotalSupply();
+
+      let balanceBefore = await token.balanceOf(wallet);
+      let residualTokens = maxTokenSupply.sub(totalSupply);
+
+      await token.mintReservedTokens(residualTokens);
+
+      let balanceAfter = await token.balanceOf(wallet);
+      assert.equal(balanceBefore.add(residualTokens).valueOf(), balanceAfter.valueOf());
+    });
+
     it('allows only the owner of the contract to mint reserved tokens', async () => {
       let token = await BodhiToken.deployed();
 
@@ -121,20 +136,23 @@ contract('BodhiToken', function(accounts) {
     it('does not allow minting if it exceeds the total token supply', async () => {
       let token = await BodhiToken.deployed();
 
-      let initialSupply = web3.toBigNumber(await token.totalSupply());
+      let beforeTotalSupply = web3.toBigNumber(await token.totalSupply());
       let presaleAmount = web3.toBigNumber(config.presaleAmount);
-      assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
+      assert.equal(beforeTotalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
       try {
-        let mintedTokenAmount = web3.toBigNumber(web3.toWei(81e6, 'ether'));
-        await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
+        let maxTokenSupply = await token.tokenTotalSupply();
+        let overflowAmount = maxTokenSupply.sub(beforeTotalSupply).add(1);
+
+        // let mintedTokenAmount = web3.toBigNumber(web3.toWei(81e6, 'ether'));
+        await token.mintReservedTokens(overflowAmount, {from: accounts[0]});
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), /invalid opcode/);
       }
 
-      let actualTotalSupply = web3.toBigNumber(await token.totalSupply());
-      assert.equal(actualTotalSupply.toString(), initialSupply.toString(), "Total supply does not match.");
+      let afterTotalSupply = web3.toBigNumber(await token.totalSupply());
+      assert.equal(afterTotalSupply.toString(), beforeTotalSupply.toString(), "Total supply does not match.");
     });
   });
 
@@ -379,42 +397,5 @@ contract('BodhiToken', function(accounts) {
     let token = await BodhiToken.deployed();
     let totalSupply = await token.totalSupply();
     assert.equal(totalSupply.toNumber(), config.presaleAmount);
-  });
-
-  it('should be able to mint the reserved portion to the owner', async() => {
-    let token = await BodhiToken.deployed();
-    let totalSupply = await token.totalSupply();
-    let owner = await token.owner();
-    let maxTokenSupply = await token.tokenTotalSupply();
-
-    let balanceBefore = await token.balanceOf(owner);
-    let residualTokens = maxTokenSupply.sub(totalSupply);
-
-    await token.mintReservedTokens(residualTokens);
-
-    let balanceAfter = await token.balanceOf(owner);
-
-    assert.equal(
-      balanceBefore.add(residualTokens).valueOf(), 
-      balanceAfter.valueOf()
-    );
-  });
-
-  it('forbids minting more than token total supply', async() => {
-    let token = await BodhiToken.deployed();
-    let totalSupply = await token.totalSupply();
-    let owner = await token.owner();
-    let maxTokenSupply = await token.tokenTotalSupply();
-
-    let balanceBefore = await token.balanceOf(owner);
-    // One more BOT above the limit
-    let overflowAmount = maxTokenSupply.sub(totalSupply).add(1);
-
-    try {
-      await token.mintReservedTokens(overflowAmount);
-      assert.fail();
-    } catch(e) {
-      assert.match(e.message, /invalid opcode/);
-    }
   });
 });
