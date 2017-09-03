@@ -30,9 +30,13 @@ contract('BodhiToken', function(accounts) {
       let expectedSaleAmount = web3.toBigNumber(web3.toWei(60e6, "ether"));
       assert.equal(maxTokenForSale.toString(), expectedSaleAmount.toString(), "Sale amount does not match.");
 
-      let totalSupply = web3.toBigNumber(await token.tokenTotalSupply());
-      let expectedTotalSupply = web3.toBigNumber(web3.toWei(100e6, "ether"));
-      assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "Total token supply does not match.");
+      let totalTokenSupply = web3.toBigNumber(await token.tokenTotalSupply());
+      let expectedTotalTokenSupply = web3.toBigNumber(web3.toWei(100e6, "ether"));
+      assert.equal(totalTokenSupply.toString(), expectedTotalTokenSupply.toString(), "Total token supply does not match.");
+
+      let totalSupply = web3.toBigNumber(await token.totalSupply());
+      let expectedTotalSupply = web3.toBigNumber(config.presaleAmount);
+      assert.equal(totalSupply.toString(), expectedTotalSupply.toString());
     });
 
     it("should mint presale token and allocate to the owner", async function() {
@@ -391,11 +395,5 @@ contract('BodhiToken', function(accounts) {
         assert.match(e.message, /invalid opcode/);
       }
     });
-  });
-
-  it('should return the totalSupply', async () => {
-    let token = await BodhiToken.deployed();
-    let totalSupply = await token.totalSupply();
-    assert.equal(totalSupply.toNumber(), config.presaleAmount);
   });
 });
