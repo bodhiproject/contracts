@@ -142,6 +142,24 @@ contract('BodhiToken', function(accounts) {
         assert.match(e.toString(), /invalid opcode/);
       }
     });
+
+    it('allows an address to buy tokens on behalf of a beneficiary', async () => {
+      let token = await BodhiToken.deployed();
+
+      await blockHeightManager.mineTo(validPurchaseBlock);
+
+      let purchaser = accounts[1];
+      let beneficiary = accounts[2];
+      let value = web3.toWei(1);
+      await token.buyTokens(beneficiary, {from: purchaser, value: value});
+      
+      let purchaserBalance = await token.balanceOf(purchaser);
+      assert.equal(purchaserBalance.toNumber(), 0, "Purchaser balance should be 0.");
+
+      let beneficiaryBalance = await token.balanceOf(beneficiary);
+      let expectedBeneficiaryBalance = await token.exchangeTokenAmount(value);
+      assert.equal(beneficiaryBalance.toNumber(), expectedBeneficiaryBalance, "Beneficiary balance does not match.");
+    });
   });
 
   describe('Forwarding Funds', () => {
