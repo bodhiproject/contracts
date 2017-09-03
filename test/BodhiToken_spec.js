@@ -61,12 +61,7 @@ contract('BodhiToken', function(accounts) {
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
 
       try {
-        await requester.sendTransactionAsync({
-          to: token.address,
-          from,
-          value: 0
-        });
-
+        await token.buyTokens(from, {value: value});
         assert.fail();
       }
       catch(e) {
@@ -84,12 +79,7 @@ contract('BodhiToken', function(accounts) {
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
 
       try {
-        await requester.sendTransactionAsync({
-          to: token.address,
-          from,
-          value: 0
-        });
-
+        await token.buyTokens(from, {value: value});
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), /invalid opcode/);
@@ -99,8 +89,7 @@ contract('BodhiToken', function(accounts) {
     it('accept buying token between start and end block', async () => {
       let token = await BodhiToken.deployed();
 
-      let destBlock = parseInt((config.startBlock + config.endBlock) / 2);
-      await blockHeightManager.mineTo(destBlock);
+      await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1]; // Using the second account to purchase BOT
       let value = web3.toWei(1); // Buy 1 ETH worth of BOT
@@ -113,7 +102,7 @@ contract('BodhiToken', function(accounts) {
     it('reject zero value purchase', async () => {
       let token = await BodhiToken.deployed();
 
-      await blockHeightManager.mineTo((config.startBlock + config.endBlock) / 2);
+      await blockHeightManager.mineTo(validPurchaseBlock);
 
       let blockNumber = await requester.getBlockNumberAsync();
       assert.isAtMost(blockNumber, config.endBlock);
@@ -123,12 +112,7 @@ contract('BodhiToken', function(accounts) {
       let value = web3.toWei(0);
 
       try {
-        await requester.sendTransactionAsync({
-          to: token.address,
-          from,
-          value
-        });
-
+        await token.buyTokens(from, {value: value});
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), /invalid opcode/);
