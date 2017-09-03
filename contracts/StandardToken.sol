@@ -1,9 +1,7 @@
 pragma solidity ^0.4.11;
 
-
 import './BasicToken.sol';
 import './ERC20.sol';
-
 
 /**
  * @title Standard ERC20 token
@@ -13,9 +11,7 @@ import './ERC20.sol';
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, BasicToken {
-
   mapping (address => mapping (address => uint256)) allowed;
-
 
   /**
    * @dev Transfer tokens from one address to another
@@ -44,7 +40,6 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value The amount of tokens to be spent.
    */
   function approve(address _spender, uint256 _value) returns (bool) {
-
     // To change the approve amount you first have to reduce the addresses`
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
@@ -65,5 +60,4 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-
 }
