@@ -60,6 +60,8 @@ contract BodhiToken is StandardToken, Ownable {
     buyTokens(msg.sender);
   }
 
+  /// @notice allows buying tokens from different address than msg.sender
+  /// @param _beneficiary address that will contain the purchased BOT tokens
   function buyTokens(address _beneficiary) 
     payable 
     validAddress(_beneficiary) 
@@ -71,7 +73,7 @@ contract BodhiToken is StandardToken, Ownable {
     // Ensure new token increment does not exceed the sale amount
     assert(checkedSupply <= saleAmount);
 
-    mint(msg.sender, tokenAmount);
+    mint(_beneficiary, tokenAmount);
     TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
 
     forwardFunds();
@@ -88,7 +90,7 @@ contract BodhiToken is StandardToken, Ownable {
     return initialExchangeRate.mul(_weiAmount);
   }
 
-  // Send ether to the fund collection wallet
+  // Send ether to the contract owner
   function forwardFunds() internal {
     owner.transfer(msg.value);
   } 
