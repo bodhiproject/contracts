@@ -286,14 +286,18 @@ contract('BodhiToken', function(accounts) {
     it('does not allow buying tokens once sale amount has been reached', async () => {
       let token = await BodhiToken.deployed();
 
+      console.log("TOKEN TOTAL SUPPLY: " + await token.tokenTotalSupply());
+
       var totalSupply = web3.toBigNumber(await token.totalSupply());
       let presaleAmount = web3.toBigNumber(config.presaleAmount);
       assert.equal(totalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
+      console.log("PRESALE TOTAL SUPPLY: " + totalSupply);
+
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       var purchaser = accounts[1];
-      var value = web3.toWei(40);
+      var value = web3.toWei(40, "ether");
       await token.buyTokens(purchaser, {from: purchaser, value: value});
 
       totalSupply = web3.toBigNumber(await token.totalSupply());
