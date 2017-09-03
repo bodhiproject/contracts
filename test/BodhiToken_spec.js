@@ -147,8 +147,6 @@ contract('BodhiToken', function(accounts) {
       try {
         let maxTokenSupply = await token.tokenTotalSupply();
         let overflowAmount = maxTokenSupply.sub(beforeTotalSupply).add(1);
-
-        // let mintedTokenAmount = web3.toBigNumber(web3.toWei(81e6, 'ether'));
         await token.mintReservedTokens(overflowAmount, {from: accounts[0]});
         assert.fail();
       } catch(e) {
@@ -167,8 +165,8 @@ contract('BodhiToken', function(accounts) {
       assert(await requester.getBlockNumberAsync() < config.startBlock, 
         'current block height should less than start block height');;
 
-      let from = accounts[1]; // Using the second account to purchase BOT
-      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+      let from = accounts[1];
+      let value = web3.toWei(1);
 
       try {
         await token.buyTokens(from, {value: value});
@@ -184,8 +182,8 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(config.endBlock + 10);
       assert.isAtLeast(await requester.getBlockNumberAsync(), config.endBlock);
 
-      let from = accounts[1]; // Using the second account to purchase BOT
-      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+      let from = accounts[1];
+      let value = web3.toWei(1); 
 
       try {
         await token.buyTokens(from, {value: value});
@@ -200,8 +198,8 @@ contract('BodhiToken', function(accounts) {
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
-      let from = accounts[1]; // Using the second account to purchase BOT
-      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+      let from = accounts[1];
+      let value = web3.toWei(1);
       await token.buyTokens(from, {value: value});
       
       let balance = await token.balanceOf(from);
@@ -217,7 +215,7 @@ contract('BodhiToken', function(accounts) {
       assert.isAtMost(blockNumber, config.endBlock);
       assert.isAtLeast(blockNumber, config.startBlock);
 
-      let from = accounts[1]; // Using the second account to purchase BOT
+      let from = accounts[1];
       let value = web3.toWei(0);
 
       try {
@@ -237,7 +235,7 @@ contract('BodhiToken', function(accounts) {
       assert.isAtLeast(blockNumber, config.startBlock);
       assert.isAtMost(blockNumber, config.endBlock);
 
-      let from = accounts[1]; // Using the second account to purchase BOT
+      let from = accounts[1];
       let value = web3.toWei(0);
 
       try {
@@ -327,8 +325,8 @@ contract('BodhiToken', function(accounts) {
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
-      let from = accounts[1]; // Using the second account to purchase BOT
-      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+      let from = accounts[1];
+      let value = web3.toWei(1);
 
       await requester.sendTransactionAsync({
         to: token.address,
@@ -347,12 +345,10 @@ contract('BodhiToken', function(accounts) {
       var ownerBalance = await requester.getBalanceAsync(owner);
       assert.equal(ownerBalance, 0, "Owner balance should be 0.");
 
-      // Not start yet, it's required to be less than 
-      // 5 transactions from now on
       await blockHeightManager.mineTo(config.startBlock - 5);
 
-      let from = accounts[1]; // Using the second account to purchase BOT
-      let value = web3.toWei(1); // Buy 1 ETH worth of BOT
+      let from = accounts[1];
+      let value = web3.toWei(1);
 
       try {
         await requester.sendTransactionAsync({
