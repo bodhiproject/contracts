@@ -18,6 +18,7 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public fundingEndBlock;
   uint256 public initialExchangeRate;
 
+  // Events
   event Mint(uint256 supply, address indexed to, uint256 amount);
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
@@ -54,12 +55,8 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _presaleAmount);
   }
 
-  function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
-    return initialExchangeRate.mul(_weiAmount);
-  }
-
   // Fallback function to accept QTUM during token sale
-  function () external payable {
+  function() external payable {
     buyTokens(msg.sender);
   }
 
@@ -87,7 +84,11 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _amount);
   }
 
-  // Send ether to the fund collection owner
+  function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
+    return initialExchangeRate.mul(_weiAmount);
+  }
+
+  // Send ether to the fund collection wallet
   function forwardFunds() internal {
     owner.transfer(msg.value);
   } 
