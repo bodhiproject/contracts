@@ -55,21 +55,6 @@ contract('BodhiToken', function(accounts) {
   });
 
   describe("Minting", () => {
-    it('should be able to mint the reserved portion to the wallet', async() => {
-      let token = await BodhiToken.deployed();
-      let totalSupply = await token.totalSupply();
-      let wallet = await token.wallet();
-      let maxTokenSupply = await token.tokenTotalSupply();
-
-      let balanceBefore = await token.balanceOf(wallet);
-      let residualTokens = maxTokenSupply.sub(totalSupply);
-
-      await token.mintReservedTokens(residualTokens);
-
-      let balanceAfter = await token.balanceOf(wallet);
-      assert.equal(balanceBefore.add(residualTokens).valueOf(), balanceAfter.valueOf());
-    });
-
     it('allows only the owner of the contract to mint reserved tokens', async () => {
       let token = await BodhiToken.deployed();
 
@@ -102,6 +87,21 @@ contract('BodhiToken', function(accounts) {
 
       let actualMintSupply = web3.toBigNumber(await token.totalSupply());
       assert.equal(actualMintSupply.toString(), initialSupply.toString(), "Expected total supply does not match.");
+    });
+
+    it('should be able to mint the reserved portion to the wallet', async() => {
+      let token = await BodhiToken.deployed();
+      let totalSupply = await token.totalSupply();
+      let wallet = await token.wallet();
+      let maxTokenSupply = await token.tokenTotalSupply();
+
+      let balanceBefore = await token.balanceOf(wallet);
+      let residualTokens = maxTokenSupply.sub(totalSupply);
+
+      await token.mintReservedTokens(residualTokens);
+
+      let balanceAfter = await token.balanceOf(wallet);
+      assert.equal(balanceBefore.add(residualTokens).valueOf(), balanceAfter.valueOf());
     });
 
     it('allows owner to mint reserved tokens after the end block has been reached', async () => {
