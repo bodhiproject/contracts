@@ -56,7 +56,7 @@ contract BodhiToken is StandardToken, Ownable {
     initialExchangeRate = _initialExchangeRate;
 
     // Mint the presale tokens, distribute to a receiver
-    // Increase the totalSupply accordinglly
+    // Increase the totalSupply accordingly
     mint(owner, _presaleAmount);
   }
 

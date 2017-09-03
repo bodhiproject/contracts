@@ -263,6 +263,37 @@ contract('BodhiToken', function(accounts) {
       let expectedBalance = await token.exchangeTokenAmount(value);
       assert.equal(balance.toString(), expectedBalance.toString(), "Balance does not match.");
     });
+
+    it('does not allow buying tokens once sale amount has been reached', async () => {
+      let token = await BodhiToken.deployed();
+
+      var totalSupply = web3.toBigNumber(await token.totalSupply());
+      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      assert.equal(totalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
+
+      await blockHeightManager.mineTo(validPurchaseBlock);
+
+      var purchaser = accounts[1];
+      var value = web3.toWei(40e6);
+      await token.buyTokens(purchaser, {from: purchaser, value: value});
+
+      totalSupply = web3.toBigNumber(await token.totalSupply());
+      let saleAmount = web3.toBigNumber(await token.saleAmount());
+      assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should equal sale amount.");
+
+      purchaser = accounts[2];
+      value = web3.toWei(1e6);
+
+      try {
+        await token.buyTokens(purchaser, {value: value});
+        assert.fail();
+      } catch(e) {
+        assert.match(e.toString(), /invalid opcode/);
+      }
+
+      totalSupply = web3.toBigNumber(await token.totalSupply());
+      assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should match sale amount.");
+    });
   });
 
   describe('Forwarding Funds', () => {
