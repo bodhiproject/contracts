@@ -34,13 +34,14 @@ contract('BodhiToken', function(accounts) {
       assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "Total token supply does not match.");
     });
 
-    it("should mint presale token and allocate to the wallet", async function() {
+    it("should mint presale token and allocate to the owner", async function() {
       let token = await BodhiToken.deployed();
 
       // Assert the presale allocation
-      let walletBalance = await token.balanceOf.call('0x12345');
+      let owner = await token.owner();
+      let ownerBalance = await token.balanceOf(owner);
       let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount);
-      assert.equal(walletBalance.toString(), expectedPresaleAmount.toString(), "Wallet balance does not match presale amount.");
+      assert.equal(ownerBalance.toString(), expectedPresaleAmount.toString(), "Owner balance does not match presale amount.");
 
       // Assert the supply is updated
       let totalSupply = await token.totalSupply();
@@ -147,14 +148,12 @@ contract('BodhiToken', function(accounts) {
   });
 
   describe('forward funds', () => {
-    it('should forward funds to the wallet', async () => {
+    it('should forward funds to the owner', async () => {
       let token = await BodhiToken.deployed();
-      let wallet = await token.wallet();
+      let owner = await token.owner();
 
-      // Initial balance of the wallet
-      let walletBalance = await requester.getBalanceAsync(wallet);
-
-      assert.equal(walletBalance.valueOf(), 0);
+      // Initial balance of the owner
+      let initialBalance = await requester.getBalanceAsync(owner);
 
       await blockHeightManager.mineTo(config.startBlock + 1);
 
@@ -167,15 +166,15 @@ contract('BodhiToken', function(accounts) {
         value
       });
 
-      walletBalance = await requester.getBalanceAsync(wallet);
-      assert(walletBalance.eq(value));
+      ownerBalance = await requester.getBalanceAsync(owner);
+      assert.equal(ownerBalance - initialBalance, value);
     });
 
     it('should revert all funds if transaction is failed', async () => {
       let token = await BodhiToken.deployed();
-      let wallet = await token.wallet();
+      let owner = await token.owner();
 
-      let walletBalance = await requester.getBalanceAsync(wallet);
+      let ownerBalance = await requester.getBalanceAsync(owner);
 
       // Not start yet, it's required to be less than 
       // 5 transactions from now on
@@ -198,8 +197,8 @@ contract('BodhiToken', function(accounts) {
       }
 
 
-      walletBalance = await requester.getBalanceAsync(wallet);
-      assert(walletBalance.valueOf(), 0);
+      ownerBalance = await requester.getBalanceAsync(owner);
+      assert(ownerBalance.valueOf(), 0);
     });
   });
 
@@ -239,18 +238,18 @@ contract('BodhiToken', function(accounts) {
     assert.equal(totalSupply.toNumber(), config.presaleAmount);
   });
 
-  it('should be able to mint the reserved portion to the wallet', async() => {
+  it('should be able to mint the reserved portion to the owner', async() => {
     let token = await BodhiToken.deployed();
     let totalSupply = await token.totalSupply();
-    let wallet = await token.wallet();
+    let owner = await token.owner();
     let maxTokenSupply = await token.tokenTotalSupply();
 
-    let balanceBefore = await token.balanceOf(wallet);
+    let balanceBefore = await token.balanceOf(owner);
     let residualTokens = maxTokenSupply.sub(totalSupply);
 
     await token.mintReservedTokens(residualTokens);
 
-    let balanceAfter = await token.balanceOf(wallet);
+    let balanceAfter = await token.balanceOf(owner);
 
     assert.equal(
       balanceBefore.add(residualTokens).valueOf(), 
@@ -261,10 +260,10 @@ contract('BodhiToken', function(accounts) {
   it('forbids minting more than token total supply', async() => {
     let token = await BodhiToken.deployed();
     let totalSupply = await token.totalSupply();
-    let wallet = await token.wallet();
+    let owner = await token.owner();
     let maxTokenSupply = await token.tokenTotalSupply();
 
-    let balanceBefore = await token.balanceOf(wallet);
+    let balanceBefore = await token.balanceOf(owner);
     // One more BOT above the limit
     let overflowAmount = maxTokenSupply.sub(totalSupply).add(1);
 
