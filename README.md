@@ -111,9 +111,8 @@ Saving successful migration to network...
   ... 0x7ed4922045102c65f16d109de4dd6ba1e21a84774313b9403c3bc4d923af9806
 Saving artifacts...
 ```
-*** Please note there was an error (I chatted with someone on Gitter and he had the exact same issue), but the contract looks like it deployed correctly.
 
-9. In the `Signer` tab of `Parity` console you can see the accepted transactions. The 3rd one was the token contract, which you can click on and see the transaction in `etherscan`.
+9. In the `Signer` tab of `Parity` console you can see the accepted transactions. You can click on the address to see the transaction in `etherscan`.
     
 ## TODOs
 1. Deploy the contract to QTUM testnet. 
