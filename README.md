@@ -81,49 +81,35 @@ module.exports = {
 ```
 function Config(web3) {
   return {
-    startBlock: 3530000,
-    endBlock: 3630000,
-    initialExchangeRate: 10000000,
-    decayPeriod: 100, // decay 10% every 20 blocks
-    presaleAmount: web3.toWei(30e6),
-    wallet: "0x001713695891806EA2FD001F406fa0Ce96e8467F" // This wallet should be your Kovan Testnet wallet address
+    startBlock: 3584300,
+    endBlock: 3605900,
+    initialExchangeRate: 100,
+    presaleAmount: web3.toWei(30e6)
   }
 };
 ```
 4. Make sure you have your Parity console open: `http://127.0.0.1:8180/`
 5. `truffle compile`
 6. `truffle migrate --reset --network=kovan`
-7. You will get notifications in your Parity console to approve the transactions.
-   I had 3 transactions I had to approve/enter password.
+7. You will get notifications in your Parity console to approve the transactions by entering your password. I had to do a total of 4 approvals before my contract was fully deployed.
 8. Here was the output on the command line:
 ```
+Using network 'kovan'.
+
 Running migration: 1_initial_migration.js
-  Deploying Migrations...
-oh   ... 0xbf65c2e47dfc0908139fc342d4e716e6ce43d8e14efaccf76eb58e4652a0eccd
-  Migrations: 0xbfdb9a8ab645044b8961fe88d455befce6ea8379
+  Replacing Migrations...
+  ... 0x6c7c545bb3e4c22a74d32bacc3b56e08b71db80d06f7058c047bed6d5adb3fe4
+  Migrations: 0xaafbe4d72858fa105ec886565d79d196e70fc396
 Saving successful migration to network...
-  ... 0x26047ba497aee425259d09ca7df0c7d6086db67fb96dbc198a8e24c51382bbd8
+  ... 0xf2bae05225ab7e02106ea96f6525c8a5f4f9e2466af7849faf058233cde13539
 Saving artifacts...
 Running migration: 2_deploy_contracts.js
   Deploying BodhiToken...
-  ... 0x7fd8aa4a6b4104d105463cefbb730fe6647f2272d82f0ecf283705e573daef26
-Error encountered, bailing. Network state unknown. Review successful transactions manually.
-Error: The contract code couldn't be stored, please check your gas amount.
-    at Object.callback (/usr/local/lib/node_modules/truffle/build/cli.bundled.js:222830:46)
-    at /usr/local/lib/node_modules/truffle/build/cli.bundled.js:35149:25
-    at /usr/local/lib/node_modules/truffle/build/cli.bundled.js:224768:9
-    at /usr/local/lib/node_modules/truffle/build/cli.bundled.js:66971:11
-    at /usr/local/lib/node_modules/truffle/build/cli.bundled.js:208348:9
-    at XMLHttpRequest.request.onreadystatechange (/usr/local/lib/node_modules/truffle/build/cli.bundled.js:209773:13)
-    at XMLHttpRequestEventTarget.dispatchEvent (/usr/local/lib/node_modules/truffle/build/cli.bundled.js:67130:18)
-    at XMLHttpRequest._setReadyState (/usr/local/lib/node_modules/truffle/build/cli.bundled.js:67420:12)
-    at XMLHttpRequest._onHttpResponseEnd (/usr/local/lib/node_modules/truffle/build/cli.bundled.js:67575:12)
-    at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/truffle/build/cli.bundled.js:67535:24)
-    at emitNone (events.js:110:20)
-    at IncomingMessage.emit (events.js:207:7)
-    at endReadableNT (_stream_readable.js:1059:12)
-    at _combinedTickCallback (internal/process/next_tick.js:138:11)
-    at process._tickCallback (internal/process/next_tick.js:180:9)
+  ... 0x1531244586220979c3fba5e94d0ff58194b1255196dc99874e63fd0bebdbeb7f
+  BodhiToken: 0x94d94ee28e164ba0ba44ac03f208293d4196c73f
+Saving successful migration to network...
+  ... 0x7ed4922045102c65f16d109de4dd6ba1e21a84774313b9403c3bc4d923af9806
+Saving artifacts...
 ```
 *** Please note there was an error (I chatted with someone on Gitter and he had the exact same issue), but the contract looks like it deployed correctly.
 
