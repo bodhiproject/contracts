@@ -17,7 +17,6 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
   uint256 public initialExchangeRate;
-  address public wallet;
 
   event Mint(uint256 supply, address indexed to, uint256 amount);
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
@@ -40,22 +39,19 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 _fundingStartBlock,
     uint256 _fundingEndBlock,
     uint256 _initialExchangeRate,
-    uint256 _presaleAmount,
-    address _wallet) {
+    uint256 _presaleAmount) {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_initialExchangeRate > 0);
     require(_presaleAmount <= saleAmount);
-    require(_wallet != address(0));
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
     initialExchangeRate = _initialExchangeRate;
-    wallet = _wallet;
 
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordinglly
-    mint(wallet, _presaleAmount);
+    mint(owner, _presaleAmount);
   }
 
   function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
@@ -88,12 +84,12 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
 
-    mint(wallet, _amount);
+    mint(owner, _amount);
   }
 
-  // Send ether to the fund collection wallet
+  // Send ether to the fund collection owner
   function forwardFunds() internal {
-    wallet.transfer(msg.value);
+    owner.transfer(msg.value);
   }
 
    /**
