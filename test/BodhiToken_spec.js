@@ -6,6 +6,10 @@ const bluebird = require('bluebird');
 
 const requester = bluebird.promisifyAll(web3.eth);
 
+/**
+ * One of the tests requires high value accounts (containing 400k Ether).
+ * Run the script 'testrpc_high_value.sh' to start TestRPC with 4 high value accounts.
+ */
 contract('BodhiToken', function(accounts) {
   const blockHeightManager = new BlockHeightManager(web3);
   const validPurchaseBlock = (config.startBlock + config.endBlock) / 2;
@@ -283,8 +287,6 @@ contract('BodhiToken', function(accounts) {
       assert.equal(balance.toString(), expectedBalance.toString(), "Balance does not match.");
     });
 
-    // This test will not pass without having enough Ether in the account.
-    // Run the script 'testrpc_high_value.sh' to start TestRPC with high value accounts.
     it('does not allow buying tokens once sale amount has been reached', async () => {
       let token = await BodhiToken.deployed();
 
