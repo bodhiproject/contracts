@@ -93,18 +93,18 @@ contract('BodhiToken', function(accounts) {
       assert.equal(actualMintSupply.toString(), initialSupply.toString(), "Expected total supply does not match.");
     });
 
-    it('should be able to mint the reserved portion to the wallet', async() => {
+    it('should be able to mint the reserved portion to the owner', async() => {
       let token = await BodhiToken.deployed();
       let totalSupply = await token.totalSupply();
-      let wallet = await token.wallet();
+      let owner = await token.owner();
       let maxTokenSupply = await token.tokenTotalSupply();
 
-      let balanceBefore = await token.balanceOf(wallet);
+      let balanceBefore = await token.balanceOf(owner);
       let residualTokens = maxTokenSupply.sub(totalSupply);
 
       await token.mintReservedTokens(residualTokens);
 
-      let balanceAfter = await token.balanceOf(wallet);
+      let balanceAfter = await token.balanceOf(owner);
       assert.equal(balanceBefore.add(residualTokens).valueOf(), balanceAfter.valueOf());
     });
 
@@ -297,7 +297,7 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       var purchaser = accounts[1];
-      var value = web3.toWei(4e5, "ether");
+      var value = web3.toWei(3e5, "ether");
       await token.buyTokens(purchaser, {from: purchaser, value: value});
 
       totalSupply = web3.toBigNumber(await token.totalSupply());
@@ -308,7 +308,7 @@ contract('BodhiToken', function(accounts) {
       value = web3.toWei(1);
 
       try {
-        await token.buyTokens(purchaser, {value: value});
+        await token.buyTokens(purchaser, {from: purchaser, value: value});
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), /invalid opcode/);
@@ -323,31 +323,23 @@ contract('BodhiToken', function(accounts) {
     it('should forward funds to the owner', async () => {
       let token = await BodhiToken.deployed();
       let owner = await token.owner();
-
-      var ownerBalance = await requester.getBalanceAsync(owner);
-      assert.equal(ownerBalance.valueOf(), 0, "Owner balance should be 0.");
+      let beforeTransferBalance = web3.toBigNumber(await requester.getBalanceAsync(owner));
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1];
       let value = web3.toWei(1);
+      await token.buyTokens(from, {from: from, value: value});
 
-      await requester.sendTransactionAsync({
-        to: token.address,
-        from,
-        value
-      });
-
-      ownerBalance = await requester.getBalanceAsync(owner);
-      assert.equal(ownerBalance - initialBalance, value);
+      let afterTransferBalance = web3.toBigNumber(await requester.getBalanceAsync(owner));
+      let actualBalance = afterTransferBalance.sub(beforeTransferBalance);
+      assert.equal(actualBalance.toString(), value.toString(), "Balances do not match.");
     });
 
     it('should revert all funds if transaction is failed', async () => {
       let token = await BodhiToken.deployed();
       let owner = await token.owner();
-
-      var ownerBalance = await requester.getBalanceAsync(owner);
-      assert.equal(ownerBalance, 0, "Owner balance should be 0.");
+      let beforeBalance = await requester.getBalanceAsync(owner);
 
       await blockHeightManager.mineTo(config.startBlock - 5);
 
@@ -355,19 +347,14 @@ contract('BodhiToken', function(accounts) {
       let value = web3.toWei(1);
 
       try {
-        await requester.sendTransactionAsync({
-          to: token.address,
-          from,
-          value
-        });
-
+        await token.buyTokens(from, {from: from, value: value});
         assert.fail();
       } catch(e) {
         assert.match(e.message, /invalid opcode/);
       }
 
-      ownerBalance = await requester.getBalanceAsync(owner);
-      assert(ownerBalance.valueOf(), 0);
+      let afterBalance = await requester.getBalanceAsync(owner);
+      assert.equal(beforeBalance.toString(), afterBalance.toString(), "Balances do not match.");
     });
   });
 

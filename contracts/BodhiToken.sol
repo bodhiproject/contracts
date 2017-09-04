@@ -40,7 +40,6 @@ contract BodhiToken is StandardToken, Ownable {
   /// @param _fundingEndBlock The ending block of crowdsale
   /// @param _initialExchangeRate The exchange rate of Ether to BOT
   /// @param _presaleAmount The amount of BOT that will be available for presale
-  /// @param _wallet The address where all the funds will be stored
   function BodhiToken(
     uint256 _fundingStartBlock,
     uint256 _fundingEndBlock,
