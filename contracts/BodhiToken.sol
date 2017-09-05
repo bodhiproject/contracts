@@ -81,6 +81,7 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
+    require(totalSupply + _amount > totalSupply);
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
 
