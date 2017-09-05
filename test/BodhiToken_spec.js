@@ -11,7 +11,7 @@ const requester = bluebird.promisifyAll(web3.eth);
  * Run the script 'testrpc_high_value.sh' to start TestRPC with 4 high value accounts.
  */
 contract('BodhiToken', function(accounts) {
-  const errorInvalidOpcode = /invalid opcode/;
+  const regexInvalidOpcode = /invalid opcode/;
 
   const blockHeightManager = new BlockHeightManager(web3);
   const validPurchaseBlock = (config.startBlock + config.endBlock) / 2;
@@ -88,7 +88,7 @@ contract('BodhiToken', function(accounts) {
         await token.mintReservedTokens(mintedTokenAmount, {from: accounts[1]});
         assert.fail();
       } catch(e) {
-        assert.match(e.toString(), errorInvalidOpcode);
+        assert.match(e.toString(), regexInvalidOpcode);
       }
 
       let actualMintSupply = web3.toBigNumber(await token.totalSupply());
@@ -156,7 +156,7 @@ contract('BodhiToken', function(accounts) {
         await token.mintReservedTokens(overflowAmount, {from: accounts[0]});
         assert.fail();
       } catch(e) {
-        assert.match(e.toString(), errorInvalidOpcode);
+        assert.match(e.toString(), regexInvalidOpcode);
       }
 
       let afterTotalSupply = web3.toBigNumber(await token.totalSupply());
@@ -178,7 +178,7 @@ contract('BodhiToken', function(accounts) {
         await token.buyTokens(from, {value: value});
         assert.fail();
       } catch(e) {
-        assert.match(e.toString(), errorInvalidOpcode);
+        assert.match(e.toString(), regexInvalidOpcode);
       }
     });
 
@@ -195,7 +195,7 @@ contract('BodhiToken', function(accounts) {
         await token.buyTokens(from, {value: value});
         assert.fail();
       } catch(e) {
-        assert.match(e.toString(), errorInvalidOpcode);
+        assert.match(e.toString(), regexInvalidOpcode);
       }
     });
 
@@ -228,7 +228,7 @@ contract('BodhiToken', function(accounts) {
         await token.buyTokens(from, {value: value});
         assert.fail();
       } catch(e) {
-        assert.match(e.toString(), errorInvalidOpcode);
+        assert.match(e.toString(), regexInvalidOpcode);
       }
     });
 
@@ -252,7 +252,7 @@ contract('BodhiToken', function(accounts) {
         });
         assert.fail();
       } catch(e) {
-        assert.match(e.toString(), errorInvalidOpcode);
+        assert.match(e.toString(), regexInvalidOpcode);
       }
     });
 
@@ -313,7 +313,7 @@ contract('BodhiToken', function(accounts) {
         await token.buyTokens(purchaser, {from: purchaser, value: value});
         assert.fail();
       } catch(e) {
-        assert.match(e.toString(), errorInvalidOpcode);
+        assert.match(e.toString(), regexInvalidOpcode);
       }
 
       totalSupply = web3.toBigNumber(await token.totalSupply());
@@ -352,7 +352,7 @@ contract('BodhiToken', function(accounts) {
         await token.buyTokens(from, {from: from, value: value});
         assert.fail();
       } catch(e) {
-        assert.match(e.message, errorInvalidOpcode);
+        assert.match(e.message, regexInvalidOpcode);
       }
 
       let afterBalance = await requester.getBalanceAsync(owner);
@@ -383,7 +383,7 @@ contract('BodhiToken', function(accounts) {
         let rate = await token.getTokenExchangeAmount(-1);
         assert.fail();
       } catch(e) {
-        assert.match(e.message, errorInvalidOpcode);
+        assert.match(e.message, regexInvalidOpcode);
       }
     });
   });
