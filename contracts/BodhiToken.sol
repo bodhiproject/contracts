@@ -18,6 +18,7 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public fundingEndBlock;
   uint256 public initialExchangeRate;
 
+  // Events
   event Mint(uint256 supply, address indexed to, uint256 amount);
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
@@ -34,7 +35,11 @@ contract BodhiToken is StandardToken, Ownable {
     _;
   }
 
-  // Constructor
+  /// @notice Creates new BodhiToken contract
+  /// @param _fundingStartBlock The starting block of crowdsale
+  /// @param _fundingEndBlock The ending block of crowdsale
+  /// @param _initialExchangeRate The exchange rate of Ether to BOT
+  /// @param _presaleAmount The amount of BOT that will be available for presale
   function BodhiToken(
     uint256 _fundingStartBlock,
     uint256 _fundingEndBlock,
@@ -50,36 +55,36 @@ contract BodhiToken is StandardToken, Ownable {
     initialExchangeRate = _initialExchangeRate;
 
     // Mint the presale tokens, distribute to a receiver
-    // Increase the totalSupply accordinglly
+    // Increase the totalSupply accordingly
     mint(owner, _presaleAmount);
   }
 
-  function exchangeTokenAmount(uint256 _weiAmount) constant returns(uint256) {
-    return initialExchangeRate.mul(_weiAmount);
-  }
-
-  // Fallback function to accept QTUM during token sale
-  function () external payable {
+  /// @notice Fallback function to purchase tokens
+  function() external payable {
     buyTokens(msg.sender);
   }
 
+  /// @notice Allows buying tokens from different address than msg.sender
+  /// @param _beneficiary Address that will contain the purchased tokens
   function buyTokens(address _beneficiary) 
     payable 
     validAddress(_beneficiary) 
     validPurchase
   {
-    uint256 tokenAmount = exchangeTokenAmount(msg.value);
+    uint256 tokenAmount = getTokenExchangeAmount(msg.value);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
     assert(checkedSupply <= saleAmount);
 
-    mint(msg.sender, tokenAmount);
+    mint(_beneficiary, tokenAmount);
     TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
 
     forwardFunds();
   }
 
+  /// @notice Allows contract owner to mint tokens at any time
+  /// @param _amount Amount of tokens to mint
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
@@ -87,14 +92,22 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _amount);
   }
 
-  // Send ether to the fund collection owner
+  /// @notice Shows the Ether to BOT exchange rate
+  /// @param _weiAmount Ether amount to convert
+  /// @return The amount of BOT that will be received
+  function getTokenExchangeAmount(uint256 _weiAmount) constant returns(uint256) {
+    return initialExchangeRate.mul(_weiAmount);
+  }
+
+  /// @dev Sends Ether to the contract owner
   function forwardFunds() internal {
     owner.transfer(msg.value);
   }
 
-   /**
-   * @dev Function to mint tokens
-   */
+  /// @dev Mints new tokens
+  /// @param _to Address to mint the tokens to
+  /// @param _amount Amount of tokens that will be minted
+  /// @return Boolean to signify successful minting
   function mint(address _to, uint256 _amount) internal returns (bool) {
     totalSupply += _amount;
     balances[_to] = balances[_to].add(_amount);
