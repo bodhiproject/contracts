@@ -18,5 +18,8 @@ install:
   - npm install
   - npm install -g truffle
 
+before_script:
+  - testrpc_high_value.sh
+
 script:
   - truffle test --network test
