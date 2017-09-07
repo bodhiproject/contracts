@@ -14,12 +14,9 @@ addons:
     - gcc-4.8
     - g++-4.8
 
-before_install:
-  - yarn global add truffle
-
 install:
-  - yarn install
-  - yarn add ethereumjs-testrpc
+  - npm install -g truffle
+  - npm install -g ethereumjs-testrpc
 
 before_script:
   - testrpc_high_value.sh
