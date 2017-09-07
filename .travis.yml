@@ -19,7 +19,7 @@ before_install:
 
 install:
   - yarn install
-  - yarn install ethereumjs-testrpc
+  - yarn add ethereumjs-testrpc
 
 before_script:
   - testrpc_high_value.sh
