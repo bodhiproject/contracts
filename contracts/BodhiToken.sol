@@ -81,6 +81,8 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   function mintReservedTokens(uint256 _amount) onlyOwner {
+    require(totalSupply + _amount > totalSupply);
+    
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
 
@@ -96,8 +98,11 @@ contract BodhiToken is StandardToken, Ownable {
    * @dev Function to mint tokens
    */
   function mint(address _to, uint256 _amount) internal returns (bool) {
+    require(balances[_to] + _amount > balances[_to]);
+    
     totalSupply += _amount;
     balances[_to] = balances[_to].add(_amount);
+
     Mint(totalSupply, _to, _amount);
     return true;
   }
