@@ -90,7 +90,7 @@ contract BodhiToken is StandardToken, Ownable {
   // Send ether to the fund collection owner
   function forwardFunds() internal {
     owner.transfer(msg.value);
-  }
+  } 
 
    /**
    * @dev Function to mint tokens
