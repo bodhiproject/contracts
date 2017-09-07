@@ -17,10 +17,6 @@ addons:
 install:
   - npm install -g truffle
   - npm install -g ethereumjs-testrpc
-  
-script:
-  - chmod +x testrpc_high_value.sh
-  - ./testrpc_high_value.sh
 
-after_script:
+script:
   - truffle test
