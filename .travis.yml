@@ -19,12 +19,11 @@ before_install:
 
 install:
   - yarn install
-  - npm install -g ethereumjs-testrpc
+  - yarn install ethereumjs-testrpc
 
 before_script:
   - testrpc_high_value.sh
 
 script:
   - truffle test
-  
   
