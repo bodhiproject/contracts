@@ -23,6 +23,7 @@ install:
 
 before_script:
   - testrpc_high_value.sh
+  - chmod +x testrpc_high_value.sh
 
 script:
   - truffle test
