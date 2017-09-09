@@ -289,36 +289,36 @@ contract('BodhiToken', function(accounts) {
       assert.equal(balance.toString(), expectedBalance.toString(), "Balance does not match.");
     });
 
-    // it('does not allow buying tokens once sale amount has been reached', async () => {
-    //   let token = await BodhiToken.deployed();
+    it('does not allow buying tokens once sale amount has been reached', async () => {
+      let token = await BodhiToken.deployed();
 
-    //   var totalSupply = web3.toBigNumber(await token.totalSupply());
-    //   let presaleAmount = web3.toBigNumber(config.presaleAmount);
-    //   assert.equal(totalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
+      var totalSupply = web3.toBigNumber(await token.totalSupply());
+      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      assert.equal(totalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
-    //   await blockHeightManager.mineTo(validPurchaseBlock);
+      await blockHeightManager.mineTo(validPurchaseBlock);
 
-    //   var purchaser = accounts[1];
-    //   var value = web3.toWei(3e5, "ether");
-    //   await token.buyTokens(purchaser, {from: purchaser, value: value});
+      var purchaser = accounts[1];
+      var value = web3.toWei(3e5, "ether");
+      await token.buyTokens(purchaser, {from: purchaser, value: value});
 
-    //   totalSupply = web3.toBigNumber(await token.totalSupply());
-    //   let saleAmount = web3.toBigNumber(await token.saleAmount());
-    //   assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should equal sale amount.");
+      totalSupply = web3.toBigNumber(await token.totalSupply());
+      let saleAmount = web3.toBigNumber(await token.saleAmount());
+      assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should equal sale amount.");
 
-    //   purchaser = accounts[2];
-    //   value = web3.toWei(1);
+      purchaser = accounts[2];
+      value = web3.toWei(1);
 
-    //   try {
-    //     await token.buyTokens(purchaser, {from: purchaser, value: value});
-    //     assert.fail();
-    //   } catch(e) {
-    //     assert.match(e.toString(), regexInvalidOpcode);
-    //   }
+      try {
+        await token.buyTokens(purchaser, {from: purchaser, value: value});
+        assert.fail();
+      } catch(e) {
+        assert.match(e.toString(), regexInvalidOpcode);
+      }
 
-    //   totalSupply = web3.toBigNumber(await token.totalSupply());
-    //   assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should match sale amount.");
-    // });
+      totalSupply = web3.toBigNumber(await token.totalSupply());
+      assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should match sale amount.");
+    });
   });
 
   describe('Forwarding Funds', () => {
