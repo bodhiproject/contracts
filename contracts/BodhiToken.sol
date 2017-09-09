@@ -1,9 +1,9 @@
 pragma solidity ^0.4.10;
 
 import './StandardToken.sol';
-import './Ownable.sol';
+import './Pausable.sol';
 
-contract BodhiToken is StandardToken, Ownable {
+contract BodhiToken is StandardToken, Pausable {
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
@@ -70,6 +70,7 @@ contract BodhiToken is StandardToken, Ownable {
     payable 
     validAddress(_beneficiary) 
     validPurchase
+    whenNotPaused
   {
     uint256 tokenAmount = getTokenExchangeAmount(msg.value);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
