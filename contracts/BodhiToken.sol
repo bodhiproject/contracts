@@ -2,9 +2,8 @@ pragma solidity ^0.4.10;
 
 import './StandardToken.sol';
 import './Pausable.sol';
-import './Ownable.sol';
 
-contract BodhiToken is StandardToken, Pausable, Ownable {
+contract BodhiToken is StandardToken, Pausable {
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
