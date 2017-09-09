@@ -319,6 +319,24 @@ contract('BodhiToken', function(accounts) {
     //   totalSupply = web3.toBigNumber(await token.totalSupply());
     //   assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should match sale amount.");
     // });
+
+    it('allows purchasing tokens when the contract is not paused', async function() {
+      let token = await BodhiToken.deployed();
+
+      await blockHeightManager.mineTo(validPurchaseBlock);
+      let blockNumber = await requester.getBlockNumberAsync();
+      assert.isAtLeast(blockNumber, config.startBlock);
+      assert.isAtMost(blockNumber, config.endBlock);
+
+      assert.isFalse(await token.paused(), "Contract should not be paused.");
+
+      let from = accounts[1];
+      let value = web3.toWei(1);
+      await token.buyTokens(from, {value: value});
+      
+      let balance = await token.balanceOf(from);
+      assert.equal(balance.toNumber(), web3.toWei(100));
+    });
   });
 
   describe('Forwarding Funds', () => {
