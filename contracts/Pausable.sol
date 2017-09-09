@@ -3,6 +3,7 @@ pragma solidity ^0.4.11;
 import './Ownable.sol';
 
 /**
+ * @title Adds pausable functionality to other contracts
  * @dev Base contract that allows a mechanism to stop defined pausable actions.
  */
 contract Pausable is Ownable {
