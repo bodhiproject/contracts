@@ -7,11 +7,17 @@ contract BodhiToken is StandardToken, Ownable {
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
-  uint256 public constant decimals = 18;
+  uint256 public constant decimals = 8;
 
   // Token constants
-  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals); // 60 million BOT tokens for sale
-  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT tokens will ever be created
+  // 60 million BOT tokens for sale
+  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals);
+
+  // 100 million BOT tokens will ever be created
+  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
+
+  // Number of decimals for token being exchanged for BOT
+  uint256 public constant exchangeTokenDecimals = 18;
 
   // Crowdsale parameters
   uint256 public fundingStartBlock;
@@ -92,11 +98,15 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _amount);
   }
 
-  /// @notice Shows the Ether to BOT exchange rate
+  /// @notice Shows the Ether (in wei) to BOT exchange rate
   /// @param _weiAmount Ether amount to convert
   /// @return The amount of BOT that will be received
   function getTokenExchangeAmount(uint256 _weiAmount) constant returns(uint256) {
-    return initialExchangeRate.mul(_weiAmount);
+    uint256 exchangeTokenFactor = 10**exchangeTokenDecimals;
+    uint256 botTokenFactor = 10**decimals;
+    uint256 differenceFactor = (exchangeTokenFactor).div(botTokenFactor);
+    uint exchangeRate = exchangeTokenFactor.div(botTokenFactor).div(differenceFactor).mul(initialExchangeRate);
+    return exchangeRate.mul(_weiAmount);
   }
 
   /// @dev Sends Ether to the contract owner
