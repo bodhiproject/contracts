@@ -107,14 +107,7 @@ contract BodhiToken is StandardToken, Ownable {
     require(_weiAmount > 0);
     assert(exchangeTokenDecimals >= decimals);
 
-    uint256 decimalsDifference;
-    if (exchangeTokenDecimals > decimals) {
-      decimalsDifference = exchangeTokenDecimals - decimals;
-    } else {
-      decimalsDifference = decimals;
-    }
-    uint256 differenceFactor = 10**decimalsDifference;
-
+    uint256 differenceFactor = (10**exchangeTokenDecimals) / (10**decimals);
     return _weiAmount.div(differenceFactor).mul(initialExchangeRate);
   }
 
