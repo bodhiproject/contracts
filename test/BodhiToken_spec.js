@@ -367,8 +367,6 @@ contract('BodhiToken', function(accounts) {
     it('should return the correct exchange rate', async() => {
       let token = await BodhiToken.deployed();
 
-      await blockHeightManager.mineTo(config.startBlock);
-
       let exchangeTokenDecimals = await token.exchangeTokenDecimals();
       let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei);
@@ -379,13 +377,11 @@ contract('BodhiToken', function(accounts) {
       assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
     });
 
-    it('should forbid negative for the exchange rate', async () => {
+    it('should throw on a zero exchange rate', async () => {
       let token = await BodhiToken.deployed();
 
-      await blockHeightManager.mineTo(config.startBlock);
-
       try {
-        let rate = await token.getTokenExchangeAmount(-1);
+        let amount = await token.getTokenExchangeAmount(0);
         assert.fail();
       } catch(e) {
         assert.match(e.message, regexInvalidOpcode);

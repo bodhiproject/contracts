@@ -101,6 +101,7 @@ contract BodhiToken is StandardToken, Ownable {
   /// @param _weiAmount Exchanged wei amount to convert
   /// @return The amount of BOT that will be received
   function getTokenExchangeAmount(uint256 _weiAmount) constant returns(uint256) {
+    require(_weiAmount > 0);
     assert(exchangeTokenDecimals >= decimals);
 
     uint256 decimalsDifference;
