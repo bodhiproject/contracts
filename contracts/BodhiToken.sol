@@ -9,15 +9,17 @@ contract BodhiToken is StandardToken, Ownable {
   string public constant symbol = "BOT";
   uint256 public constant decimals = 8;
 
-  // Token constants
-  // 60 million BOT tokens for sale
+  /// @notice 60 million BOT tokens for sale
   uint256 public constant saleAmount = 60 * (10**6) * (10**decimals);
 
-  // 100 million BOT tokens will ever be created
+  /// @notice 100 million BOT tokens will ever be created
   uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
 
-  // Number of decimals for token being exchanged for BOT
+  /// @notice Number of decimals for token being exchanged for BOT
   uint256 public constant exchangeTokenDecimals = 18;
+
+  /// @notice Number of exchange token wei per T (10^8 T = 1 BOT)
+  uint256 public constant exchangeWeiPerToken = 10**10;
 
   // Crowdsale parameters
   uint256 public fundingStartBlock;
@@ -98,15 +100,13 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _amount);
   }
 
-  /// @notice Shows the Ether (in wei) to BOT exchange rate
-  /// @param _weiAmount Ether amount to convert
+  /// @notice Shows the amount of BOT the user will receive for amount of exchanged wei
+  /// @param _weiAmount Exchanged wei amount to convert
   /// @return The amount of BOT that will be received
   function getTokenExchangeAmount(uint256 _weiAmount) constant returns(uint256) {
     uint256 exchangeTokenFactor = 10**exchangeTokenDecimals;
-    uint256 botTokenFactor = 10**decimals;
-    uint256 differenceFactor = (exchangeTokenFactor).div(botTokenFactor);
-    uint exchangeRate = exchangeTokenFactor.div(botTokenFactor).div(differenceFactor).mul(initialExchangeRate);
-    return exchangeRate.mul(_weiAmount);
+    uint256 differenceFactor = exchangeTokenFactor.div(exchangeWeiPerToken);
+    return _weiAmount.div(differenceFactor).mul(initialExchangeRate);
   }
 
   /// @dev Sends Ether to the contract owner
