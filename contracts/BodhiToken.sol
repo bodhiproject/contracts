@@ -53,7 +53,10 @@ contract BodhiToken is StandardToken, Ownable {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_initialExchangeRate > 0);
-    require(_presaleAmount <= saleAmount);
+
+    // Converted to lowest denomination of BOT
+    uint256 presaleAmountTokens = _presaleAmount * (10**decimals);
+    require(presaleAmountTokens <= saleAmount);
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
@@ -61,7 +64,7 @@ contract BodhiToken is StandardToken, Ownable {
 
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordingly
-    mint(owner, _presaleAmount);
+    mint(owner, presaleAmountTokens);
   }
 
   /// @notice Fallback function to purchase tokens
@@ -89,7 +92,7 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   /// @notice Allows contract owner to mint tokens at any time
-  /// @param _amount Amount of tokens to mint
+  /// @param _amount Amount of tokens to mint in lowest denomination of BOT
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);

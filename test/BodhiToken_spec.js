@@ -42,7 +42,7 @@ contract('BodhiToken', function(accounts) {
       assert.equal(totalTokenSupply.toString(), expectedTotalTokenSupply.toString(), "Total token supply does not match.");
 
       let totalSupply = web3.toBigNumber(await token.totalSupply());
-      let expectedTotalSupply = web3.toBigNumber(config.presaleAmount);
+      let expectedTotalSupply = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(totalSupply.toString(), expectedTotalSupply.toString());
     });
 
@@ -52,7 +52,8 @@ contract('BodhiToken', function(accounts) {
       // Assert the presale allocation
       let owner = await token.owner();
       let ownerBalance = await token.balanceOf(owner);
-      let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount);
+      let decimals = await token.decimals();
+      let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(ownerBalance.toString(), expectedPresaleAmount.toString(), "Owner balance does not match presale amount.");
 
       // Assert the supply is updated
@@ -65,11 +66,11 @@ contract('BodhiToken', function(accounts) {
     it('allows only the owner of the contract to mint reserved tokens', async () => {
       let token = await BodhiToken.deployed();
 
+      let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(initialSupply.toString(), presaleAmount.toString());
 
-      let decimals = await token.decimals();
       let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
       await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
 
@@ -81,12 +82,12 @@ contract('BodhiToken', function(accounts) {
     it('does not allow an address other than the owner to mint reserved tokens', async () => {
       let token = await BodhiToken.deployed();
 
+      let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
       try {
-        let decimals = await token.decimals();
         let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
         await token.mintReservedTokens(mintedTokenAmount, {from: accounts[1]});
         assert.fail();
@@ -116,14 +117,14 @@ contract('BodhiToken', function(accounts) {
     it('allows owner to mint reserved tokens after the end block has been reached', async () => {
       let token = await BodhiToken.deployed();
 
+      let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
       await blockHeightManager.mineTo(config.endBlock + 1);
       assert.isAbove(await requester.getBlockNumberAsync(), config.endBlock);
 
-      let decimals = await token.decimals();
       let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
       await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
 
@@ -135,8 +136,9 @@ contract('BodhiToken', function(accounts) {
     it('allows minting if it does not exceed the total token supply', async () => {
       let token = await BodhiToken.deployed();
 
+      let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
       let maxTokenSupply = await token.tokenTotalSupply();
@@ -152,8 +154,9 @@ contract('BodhiToken', function(accounts) {
     it('does not allow minting if it exceeds the total token supply', async () => {
       let token = await BodhiToken.deployed();
 
+      let decimals = await token.decimals();
       let beforeTotalSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(beforeTotalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
       try {
@@ -177,11 +180,12 @@ contract('BodhiToken', function(accounts) {
       assert(await requester.getBlockNumberAsync() < config.startBlock, 
         'current block height should less than start block height');;
 
-      let from = accounts[1];
-      let value = web3.toWei(1);
-
       try {
-        await token.buyTokens(from, {value: value});
+        let from = accounts[1];
+        let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+        let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+
+        await token.buyTokens(from, {value: exchangeTokenWei});
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
@@ -194,11 +198,12 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(config.endBlock + 10);
       assert.isAtLeast(await requester.getBlockNumberAsync(), config.endBlock);
 
-      let from = accounts[1];
-      let value = web3.toWei(1); 
-
       try {
-        await token.buyTokens(from, {value: value});
+        let from = accounts[1];
+        let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+        let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+
+        await token.buyTokens(from, {value: exchangeTokenWei});
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
@@ -211,13 +216,15 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1];
-      let value = web3.toWei(1);
-      await token.buyTokens(from, {value: value});
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      await token.buyTokens(from, {value: exchangeTokenWei});
       
-      let balance = web3.toBigNumber(await token.balanceOf(from));
+      let actualBalance = web3.toBigNumber(await token.balanceOf(from));
+      let exchangeRate = await token.initialExchangeRate();
       let decimals = await token.decimals();
-      let expectedBalance = web3.toBigNumber(100 * Math.pow(10, decimals));
-      assert.equal(balance.toString(), expectedBalance.toString());
+      let expectedBalance = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualBalance.toString(), expectedBalance.toString());
     });
 
     it('reject zero value purchase', async () => {
@@ -229,10 +236,10 @@ contract('BodhiToken', function(accounts) {
       assert.isAtMost(blockNumber, config.endBlock);
       assert.isAtLeast(blockNumber, config.startBlock);
 
-      let from = accounts[1];
-      let value = web3.toWei(0);
-
       try {
+        let from = accounts[1];
+        let value = 0;
+
         await token.buyTokens(from, {value: value});
         assert.fail();
       } catch(e) {
@@ -250,18 +257,20 @@ contract('BodhiToken', function(accounts) {
       assert.isAtMost(blockNumber, config.endBlock);
 
       let from = accounts[1];
-      let value = web3.toWei(0);
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
 
-      try {
-        await requester.sendTransactionAsync({
-          to: token.address,
-          from,
-          value
-        });
-        assert.fail();
-      } catch(e) {
-        assert.match(e.toString(), regexInvalidOpcode);
-      }
+      await requester.sendTransactionAsync({
+        to: token.address,
+        from: from,
+        value: exchangeTokenWei
+      });
+
+      let actualBalance = web3.toBigNumber(await token.balanceOf(from));
+      let exchangeRate = await token.initialExchangeRate();
+      let decimals = await token.decimals();
+      let expectedBalance = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualBalance.toString(), expectedBalance.toString());
     });
 
     it('allows an address to buy tokens on behalf of a beneficiary', async () => {
@@ -271,15 +280,16 @@ contract('BodhiToken', function(accounts) {
 
       let purchaser = accounts[1];
       let beneficiary = accounts[2];
-      let value = web3.toWei(1);
-      await token.buyTokens(beneficiary, {from: purchaser, value: value});
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      await token.buyTokens(beneficiary, {from: purchaser, value: exchangeTokenWei});
       
       let purchaserBalance = await token.balanceOf(purchaser);
       assert.equal(purchaserBalance.toNumber(), 0, "Purchaser balance should be 0.");
 
       let beneficiaryBalance = await token.balanceOf(beneficiary);
-      let expectedBeneficiaryBalance = await token.getTokenExchangeAmount(value);
-      assert.equal(beneficiaryBalance.toNumber(), expectedBeneficiaryBalance, "Beneficiary balance does not match.");
+      let expectedBeneficiaryBalance = await token.getTokenExchangeAmount(exchangeTokenWei);
+      assert.equal(beneficiaryBalance.toString(), expectedBeneficiaryBalance.toString(), "Beneficiary balance does not match.");
     });
 
     it('sends the balance to the correct address if the beneficiary is the purchaser', async () => {
@@ -289,36 +299,51 @@ contract('BodhiToken', function(accounts) {
 
       let purchaser = accounts[1];
       let beneficiary = accounts[1];
-      let value = web3.toWei(1);
-      await token.buyTokens(beneficiary, {from: purchaser, value: value});
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      await token.buyTokens(beneficiary, {from: purchaser, value: exchangeTokenWei});
 
       let balance = await token.balanceOf(purchaser);
-      let expectedBalance = await token.getTokenExchangeAmount(value);
+      let expectedBalance = await token.getTokenExchangeAmount(exchangeTokenWei);
       assert.equal(balance.toString(), expectedBalance.toString(), "Balance does not match.");
     });
 
     it('does not allow buying tokens once sale amount has been reached', async () => {
       let token = await BodhiToken.deployed();
 
+      let decimals = await token.decimals();
       var totalSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount);
+      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(totalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
+      // Determine max number of tokens to purchase
+      // 60e14 (total) - 30e14 (presale)
+      let saleAmount = web3.toBigNumber(await token.saleAmount());
+      let maxPurchaseTokens = saleAmount - presaleAmount;
+
+      // Reverse the logic for getTokenExchangeAmount()
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      var differenceFactor;
+      if (exchangeTokenDecimals > decimals) {
+        decimalsDifference = exchangeTokenDecimals - decimals;
+      } else {
+        decimalsDifference = decimals;
+      }
+
       var purchaser = accounts[1];
-      var value = web3.toWei(3e5, "ether");
-      await token.buyTokens(purchaser, {from: purchaser, value: value});
+      var exchangeTokenWei = maxPurchaseTokens * Math.pow(10, decimalsDifference);
+      await token.buyTokens(purchaser, {from: purchaser, value: exchangeTokenWei});
 
       totalSupply = web3.toBigNumber(await token.totalSupply());
-      let saleAmount = web3.toBigNumber(await token.saleAmount());
       assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should equal sale amount.");
 
       purchaser = accounts[2];
-      value = web3.toWei(1);
+      exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
 
       try {
-        await token.buyTokens(purchaser, {from: purchaser, value: value});
+        await token.buyTokens(purchaser, {from: purchaser, value: exchangeTokenWei});
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
