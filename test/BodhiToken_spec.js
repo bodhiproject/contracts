@@ -319,21 +319,17 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       // Determine max number of tokens to purchase
-      // 60e14 (total) - 30e14 (presale)
+      // 60e14 (total) - 30e14 (presale) = 30e14 (for purchase)
       let saleAmount = web3.toBigNumber(await token.saleAmount());
       let maxPurchaseTokens = saleAmount - presaleAmount;
 
       // Reverse the logic for getTokenExchangeAmount()
+      let exchangeRate = await token.initialExchangeRate();
       let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      var differenceFactor;
-      if (exchangeTokenDecimals > decimals) {
-        decimalsDifference = exchangeTokenDecimals - decimals;
-      } else {
-        decimalsDifference = decimals;
-      }
+      let differenceFactor = Math.pow(10, exchangeTokenDecimals) / Math.pow(10, decimals);
+      var exchangeTokenWei = maxPurchaseTokens / exchangeRate * differenceFactor;
 
       var purchaser = accounts[1];
-      var exchangeTokenWei = maxPurchaseTokens * Math.pow(10, decimalsDifference);
       await token.buyTokens(purchaser, {from: purchaser, value: exchangeTokenWei});
 
       totalSupply = web3.toBigNumber(await token.totalSupply());
