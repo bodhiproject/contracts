@@ -69,11 +69,12 @@ contract('BodhiToken', function(accounts) {
       let presaleAmount = web3.toBigNumber(config.presaleAmount);
       assert.equal(initialSupply.toString(), presaleAmount.toString());
 
-      let mintedTokenAmount = web3.toBigNumber(10e6);
-      await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
+      let decimals = await token.decimals();
+      let amountToMint = web3.toBigNumber(10e6 * Math.pow(10, decimals));
+      await token.mintReservedTokens(amountToMint, {from: accounts[0]});
 
       let actualMintSupply = web3.toBigNumber(await token.totalSupply());
-      let expectedTotalSupply = initialSupply.add(mintedTokenAmount);
+      let expectedTotalSupply = initialSupply.add(amountToMint);
       assert.equal(actualMintSupply.toString(), expectedTotalSupply.toString(), "Expected total supply does not match.");
     });
 
