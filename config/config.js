@@ -5,7 +5,7 @@ function Config(web3) {
         startBlock: 40,
         endBlock: 80,
         initialExchangeRate: 100,
-        presaleAmount: (30e6 * 10e8)
+        presaleAmount: 30e14 // 30e6 * 10e8
     }
 };
 module.exports = Config;
