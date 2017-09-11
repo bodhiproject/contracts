@@ -368,12 +368,14 @@ contract('BodhiToken', function(accounts) {
       let token = await BodhiToken.deployed();
 
       await blockHeightManager.mineTo(config.startBlock);
-      
-      let weiToExchange = web3.toWei(1);
-      let actualAmount = await token.getTokenExchangeAmount(weiToExchange);
+
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei);
 
       let exchangeRate = await token.initialExchangeRate();
-      let expectedAmount = web3.toBigNumber(weiToExchange) * exchangeRate;
+      let decimals = await token.decimals();
+      let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
       assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
     });
 
