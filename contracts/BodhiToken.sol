@@ -16,7 +16,7 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
 
   /// @notice Number of decimals for token being exchanged for BOT
-  uint256 public constant exchangeTokenDecimals = 18;
+  uint256 public constant exchangeTokenDecimals = 8;
 
   // Crowdsale parameters
   uint256 public fundingStartBlock;

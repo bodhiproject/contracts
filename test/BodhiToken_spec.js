@@ -359,12 +359,13 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1];
-      let value = web3.toWei(1);
-      await token.buyTokens(from, {from: from, value: value});
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      await token.buyTokens(from, {from: from, value: exchangeTokenWei});
 
       let afterTransferBalance = web3.toBigNumber(await requester.getBalanceAsync(owner));
       let actualBalance = afterTransferBalance.sub(beforeTransferBalance);
-      assert.equal(actualBalance.toString(), value.toString(), "Balances do not match.");
+      assert.equal(actualBalance.toString(), exchangeTokenWei.toString(), "Balances do not match.");
     });
 
     it('should revert all funds if transaction is failed', async () => {
@@ -375,10 +376,11 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(config.startBlock - 5);
 
       let from = accounts[1];
-      let value = web3.toWei(1);
+      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
 
       try {
-        await token.buyTokens(from, {from: from, value: value});
+        await token.buyTokens(from, {from: from, value: exchangeTokenWei});
         assert.fail();
       } catch(e) {
         assert.match(e.message, regexInvalidOpcode);
