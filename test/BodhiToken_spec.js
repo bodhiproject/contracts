@@ -209,8 +209,10 @@ contract('BodhiToken', function(accounts) {
       let value = web3.toWei(1);
       await token.buyTokens(from, {value: value});
       
-      let balance = await token.balanceOf(from);
-      assert.equal(balance.toNumber(), web3.toWei(100));
+      let balance = web3.toBigNumber(await token.balanceOf(from));
+      let decimals = await token.decimals();
+      let expectedBalance = web3.toBigNumber(100 * Math.pow(10, decimals));
+      assert.equal(balance.toString(), expectedBalance.toString());
     });
 
     it('reject zero value purchase', async () => {

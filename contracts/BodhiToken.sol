@@ -18,9 +18,6 @@ contract BodhiToken is StandardToken, Ownable {
   /// @notice Number of decimals for token being exchanged for BOT
   uint256 public constant exchangeTokenDecimals = 18;
 
-  /// @notice Number of exchange token wei per T (10^8 T = 1 BOT)
-  uint256 public constant exchangeWeiPerToken = 10**10;
-
   // Crowdsale parameters
   uint256 public fundingStartBlock;
   uint256 public fundingEndBlock;
@@ -104,8 +101,16 @@ contract BodhiToken is StandardToken, Ownable {
   /// @param _weiAmount Exchanged wei amount to convert
   /// @return The amount of BOT that will be received
   function getTokenExchangeAmount(uint256 _weiAmount) constant returns(uint256) {
-    uint256 exchangeTokenFactor = 10**exchangeTokenDecimals;
-    uint256 differenceFactor = exchangeTokenFactor.div(exchangeWeiPerToken);
+    assert(exchangeTokenDecimals >= decimals);
+
+    uint256 decimalsDifference;
+    if (exchangeTokenDecimals > decimals) {
+      decimalsDifference = exchangeTokenDecimals - decimals;
+    } else {
+      decimalsDifference = decimals;
+    }
+    uint256 differenceFactor = 10**decimalsDifference;
+
     return _weiAmount.div(differenceFactor).mul(initialExchangeRate);
   }
 
