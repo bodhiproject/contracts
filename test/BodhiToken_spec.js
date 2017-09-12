@@ -409,6 +409,84 @@ contract('BodhiToken', function(accounts) {
       assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
     });
 
+    it('should return the correct exchange rate using 100 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
+      let token = await BodhiToken.deployed();
+
+      let exchangeRate = 100;
+      let nativeDecimals = 8;
+      let decimals = 8;
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
+
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
+      let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+    });
+
+    it('should return the correct exchange rate using 36 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
+      let token = await BodhiToken.deployed();
+
+      let exchangeRate = 36;
+      let nativeDecimals = 8;
+      let decimals = 8;
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
+
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
+      let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+    });
+
+    it('should return the correct exchange rate using 100 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
+      let token = await BodhiToken.deployed();
+
+      let exchangeRate = 100;
+      let nativeDecimals = 18;
+      let decimals = 8;
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
+
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
+      let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+    });
+
+    it('should return the correct exchange rate using 36 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
+      let token = await BodhiToken.deployed();
+
+      let exchangeRate = 36;
+      let nativeDecimals = 18;
+      let decimals = 8;
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
+
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
+      let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+    });
+
+    it('should return the correct exchange rate using 100 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
+      let token = await BodhiToken.deployed();
+
+      let exchangeRate = 100;
+      let nativeDecimals = 18;
+      let decimals = 18;
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
+
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
+      let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+    });
+
+    it('should return the correct exchange rate using 36 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
+      let token = await BodhiToken.deployed();
+
+      let exchangeRate = 36;
+      let nativeDecimals = 18;
+      let decimals = 18;
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
+
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
+      let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+    });
+
     it('should throw on a zero exchange rate', async () => {
       let token = await BodhiToken.deployed();
 
