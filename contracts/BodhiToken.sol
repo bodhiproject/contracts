@@ -7,11 +7,14 @@ contract BodhiToken is StandardToken, Ownable {
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
+  uint256 public constant nativeDecimals = 18;
   uint256 public constant decimals = 18;
 
-  // Token constants
-  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals); // 60 million BOT tokens for sale
-  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT tokens will ever be created
+  /// @notice 60 million BOT tokens for sale
+  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals);
+
+  /// @notice 100 million BOT tokens will ever be created
+  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
 
   // Crowdsale parameters
   uint256 public fundingStartBlock;
@@ -48,7 +51,12 @@ contract BodhiToken is StandardToken, Ownable {
     require(_fundingStartBlock >= block.number);
     require(_fundingEndBlock >= _fundingStartBlock);
     require(_initialExchangeRate > 0);
-    require(_presaleAmount <= saleAmount);
+
+    // Converted to lowest denomination of BOT
+    uint256 presaleAmountTokens = _presaleAmount * (10**decimals);
+    require(presaleAmountTokens <= saleAmount);
+    
+    assert(nativeDecimals >= decimals);
 
     fundingStartBlock = _fundingStartBlock;
     fundingEndBlock = _fundingEndBlock;
@@ -56,7 +64,7 @@ contract BodhiToken is StandardToken, Ownable {
 
     // Mint the presale tokens, distribute to a receiver
     // Increase the totalSupply accordingly
-    mint(owner, _presaleAmount);
+    mint(owner, presaleAmountTokens);
   }
 
   /// @notice Fallback function to purchase tokens
@@ -84,7 +92,7 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   /// @notice Allows contract owner to mint tokens at any time
-  /// @param _amount Amount of tokens to mint
+  /// @param _amount Amount of tokens to mint in lowest denomination of BOT
   function mintReservedTokens(uint256 _amount) onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
@@ -92,11 +100,14 @@ contract BodhiToken is StandardToken, Ownable {
     mint(owner, _amount);
   }
 
-  /// @notice Shows the Ether to BOT exchange rate
-  /// @param _weiAmount Ether amount to convert
+  /// @notice Shows the amount of BOT the user will receive for amount of exchanged wei
+  /// @param _weiAmount Exchanged wei amount to convert
   /// @return The amount of BOT that will be received
   function getTokenExchangeAmount(uint256 _weiAmount) constant returns(uint256) {
-    return initialExchangeRate.mul(_weiAmount);
+    require(_weiAmount > 0);
+
+    uint256 differenceFactor = (10**nativeDecimals) / (10**decimals);
+    return _weiAmount.mul(initialExchangeRate).div(differenceFactor);
   }
 
   /// @dev Sends Ether to the contract owner
