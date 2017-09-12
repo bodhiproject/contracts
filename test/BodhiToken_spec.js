@@ -290,7 +290,7 @@ contract('BodhiToken', function(accounts) {
       let beneficiaryBalance = await token.balanceOf(beneficiary);
       let decimals = await token.decimals();
       let exchangeRate = await token.initialExchangeRate();
-      let expectedBeneficiaryBalance = await token.getTokenExchangeAmount(exchangeTokenWei, nativeDecimals, decimals, exchangeRate);
+      let expectedBeneficiaryBalance = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       assert.equal(beneficiaryBalance.toString(), expectedBeneficiaryBalance.toString(), "Beneficiary balance does not match.");
     });
 
@@ -308,7 +308,7 @@ contract('BodhiToken', function(accounts) {
       let balance = await token.balanceOf(purchaser);
       let decimals = await token.decimals();
       let exchangeRate = await token.initialExchangeRate();
-      let expectedBalance = await token.getTokenExchangeAmount(exchangeTokenWei, nativeDecimals, decimals, exchangeRate);
+      let expectedBalance = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       assert.equal(balance.toString(), expectedBalance.toString(), "Balance does not match.");
     });
 
@@ -403,7 +403,7 @@ contract('BodhiToken', function(accounts) {
       let decimals = await token.decimals();
       let exchangeRate = await token.initialExchangeRate();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
-      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, nativeDecimals, decimals, exchangeRate);
+      let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
 
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
       assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
@@ -416,7 +416,7 @@ contract('BodhiToken', function(accounts) {
         let nativeDecimals = await token.nativeDecimals();
         let decimals = await token.decimals();
         let exchangeRate = await token.initialExchangeRate();
-        let amount = await token.getTokenExchangeAmount(0, nativeDecimals, decimals, exchangeRate);
+        let amount = await token.getTokenExchangeAmount(0, exchangeRate, nativeDecimals, decimals);
         assert.fail();
       } catch(e) {
         assert.match(e.message, regexInvalidOpcode);

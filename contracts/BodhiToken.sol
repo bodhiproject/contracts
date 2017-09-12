@@ -79,7 +79,7 @@ contract BodhiToken is StandardToken, Ownable {
     validAddress(_beneficiary) 
     validPurchase
   {
-    uint256 tokenAmount = getTokenExchangeAmount(msg.value, nativeDecimals, decimals, initialExchangeRate);
+    uint256 tokenAmount = getTokenExchangeAmount(msg.value, initialExchangeRate, nativeDecimals, decimals);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
@@ -108,9 +108,9 @@ contract BodhiToken is StandardToken, Ownable {
   /// @return The amount of BOT that will be received
   function getTokenExchangeAmount(
     uint256 _weiAmount, 
+    uint256 _exchangeRate,
     uint256 _nativeDecimals, 
-    uint256 _decimals, 
-    uint256 _exchangeRate) 
+    uint256 _decimals) 
     constant 
     returns(uint256) 
   {
