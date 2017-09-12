@@ -182,8 +182,8 @@ contract('BodhiToken', function(accounts) {
 
       try {
         let from = accounts[1];
-        let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-        let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+        let nativeDecimals = await token.nativeDecimals();
+        let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
         await token.buyTokens(from, {value: exchangeTokenWei});
         assert.fail();
@@ -200,8 +200,8 @@ contract('BodhiToken', function(accounts) {
 
       try {
         let from = accounts[1];
-        let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-        let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+        let nativeDecimals = await token.nativeDecimals();
+        let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
         await token.buyTokens(from, {value: exchangeTokenWei});
         assert.fail();
@@ -216,8 +216,8 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1];
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(from, {value: exchangeTokenWei});
       
       let actualBalance = web3.toBigNumber(await token.balanceOf(from));
@@ -257,8 +257,8 @@ contract('BodhiToken', function(accounts) {
       assert.isAtMost(blockNumber, config.endBlock);
 
       let from = accounts[1];
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
       await requester.sendTransactionAsync({
         to: token.address,
@@ -280,8 +280,8 @@ contract('BodhiToken', function(accounts) {
 
       let purchaser = accounts[1];
       let beneficiary = accounts[2];
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(beneficiary, {from: purchaser, value: exchangeTokenWei});
       
       let purchaserBalance = await token.balanceOf(purchaser);
@@ -299,8 +299,8 @@ contract('BodhiToken', function(accounts) {
 
       let purchaser = accounts[1];
       let beneficiary = accounts[1];
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(beneficiary, {from: purchaser, value: exchangeTokenWei});
 
       let balance = await token.balanceOf(purchaser);
@@ -325,8 +325,8 @@ contract('BodhiToken', function(accounts) {
 
       // Reverse the logic for getTokenExchangeAmount()
       let exchangeRate = await token.initialExchangeRate();
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let differenceFactor = Math.pow(10, exchangeTokenDecimals) / Math.pow(10, decimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let differenceFactor = Math.pow(10, nativeDecimals) / Math.pow(10, decimals);
       var exchangeTokenWei = maxPurchaseTokens / exchangeRate * differenceFactor;
 
       var purchaser = accounts[1];
@@ -336,7 +336,7 @@ contract('BodhiToken', function(accounts) {
       assert.equal(totalSupply.toString(), saleAmount.toString(), "Total supply should equal sale amount.");
 
       purchaser = accounts[2];
-      exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
       try {
         await token.buyTokens(purchaser, {from: purchaser, value: exchangeTokenWei});
@@ -359,8 +359,8 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1];
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(from, {from: from, value: exchangeTokenWei});
 
       let afterTransferBalance = web3.toBigNumber(await requester.getBalanceAsync(owner));
@@ -376,8 +376,8 @@ contract('BodhiToken', function(accounts) {
       await blockHeightManager.mineTo(config.startBlock - 5);
 
       let from = accounts[1];
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
       try {
         await token.buyTokens(from, {from: from, value: exchangeTokenWei});
@@ -395,8 +395,8 @@ contract('BodhiToken', function(accounts) {
     it('should return the correct exchange rate', async() => {
       let token = await BodhiToken.deployed();
 
-      let exchangeTokenDecimals = await token.exchangeTokenDecimals();
-      let exchangeTokenWei = 1 * Math.pow(10, exchangeTokenDecimals);
+      let nativeDecimals = await token.nativeDecimals();
+      let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei);
 
       let exchangeRate = await token.initialExchangeRate();
