@@ -396,7 +396,7 @@ contract('BodhiToken', function(accounts) {
   });
 
   describe('Exchange', () => {
-    it('should return the correct exchange rate using the contract defined values', async() => {
+    it('should return the correct exchange amount using the contract defined values', async() => {
       let token = await BodhiToken.deployed();
 
       let nativeDecimals = await token.nativeDecimals();
@@ -406,10 +406,10 @@ contract('BodhiToken', function(accounts) {
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
 
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
-      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange amount does not match.");
     });
 
-    it('should return the correct exchange rate using 100 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
+    it('should return the correct exchange amount using 100 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
       let token = await BodhiToken.deployed();
 
       let exchangeRate = 100;
@@ -419,10 +419,10 @@ contract('BodhiToken', function(accounts) {
 
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
-      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange amount does not match.");
     });
 
-    it('should return the correct exchange rate using 36 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
+    it('should return the correct exchange amount using 36 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
       let token = await BodhiToken.deployed();
 
       let exchangeRate = 36;
@@ -432,10 +432,10 @@ contract('BodhiToken', function(accounts) {
 
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
-      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange amount does not match.");
     });
 
-    it('should return the correct exchange rate using 100 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
+    it('should return the correct exchange amount using 100 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
       let token = await BodhiToken.deployed();
 
       let exchangeRate = 100;
@@ -445,10 +445,10 @@ contract('BodhiToken', function(accounts) {
 
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
-      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange amount does not match.");
     });
 
-    it('should return the correct exchange rate using 36 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
+    it('should return the correct exchange amount using 36 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
       let token = await BodhiToken.deployed();
 
       let exchangeRate = 36;
@@ -458,10 +458,10 @@ contract('BodhiToken', function(accounts) {
 
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
-      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange amount does not match.");
     });
 
-    it('should return the correct exchange rate using 100 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
+    it('should return the correct exchange amount using 100 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
       let token = await BodhiToken.deployed();
 
       let exchangeRate = 100;
@@ -471,10 +471,10 @@ contract('BodhiToken', function(accounts) {
 
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
-      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange amount does not match.");
     });
 
-    it('should return the correct exchange rate using 36 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
+    it('should return the correct exchange amount using 36 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
       let token = await BodhiToken.deployed();
 
       let exchangeRate = 36;
@@ -484,10 +484,10 @@ contract('BodhiToken', function(accounts) {
 
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
       let expectedAmount = web3.toBigNumber(1 * exchangeRate * Math.pow(10, decimals));
-      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange rate does not match.");
+      assert.equal(actualAmount.toString(), expectedAmount.toString(), "Exchange amount does not match.");
     });
 
-    it('should throw on a zero exchange rate', async () => {
+    it('should throw on a zero exchange amount', async () => {
       let token = await BodhiToken.deployed();
 
       try {
