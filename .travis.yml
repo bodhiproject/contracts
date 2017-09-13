@@ -19,4 +19,4 @@ install:
   - npm install -g truffle
 
 script:
-  - ./testrpc_high_value.sh & truffle test
+  - ./testrpc_high_value.sh & sleep 1000 & truffle test
