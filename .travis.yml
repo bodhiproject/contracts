@@ -15,8 +15,9 @@ addons:
     - g++-4.8
 
 install:
-  - npm install
+  - npm install -g ethereumjs-testrpc@4.1.1
   - npm install -g truffle
+  - npm install
 
 script:
   - ./testrpc_high_value.sh & truffle test
