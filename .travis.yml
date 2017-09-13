@@ -16,8 +16,8 @@ addons:
 
 install:
   - npm install -g ethereumjs-testrpc@4.1.1
-  - npm install
   - npm install -g truffle
+  - npm install
 
 script:
-  - ./testrpc_high_value.sh & sleep 1000 & truffle test
+  - ./testrpc_high_value.sh & truffle test
