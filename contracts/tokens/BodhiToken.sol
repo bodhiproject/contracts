@@ -1,7 +1,7 @@
 pragma solidity ^0.4.10;
 
 import './StandardToken.sol';
-import './Ownable.sol';
+import '../libs/Ownable.sol';
 
 contract BodhiToken is StandardToken, Ownable {
   // Token configurations

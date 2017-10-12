@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
 import './ERC20Basic.sol';
-import './SafeMath.sol';
+import '../libs/SafeMath.sol';
 
 /**
  * @title Basic token
