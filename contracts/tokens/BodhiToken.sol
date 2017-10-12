@@ -11,7 +11,7 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public constant nativeDecimals = 18;
 
   uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT ever created
-  uint256 public constant maxTokensForSale = 60 * (10**6) * (10**decimals); // Max number of tokens for sale
+  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals); // Max number of tokens for sale
   uint256 public constant exchangeRate = 100; // 100 BOT per native token
 
   // Events
@@ -43,8 +43,8 @@ contract BodhiToken is StandardToken, Ownable {
 
     mint(_beneficiary, tokenAmount);
     TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
-
-    forwardFunds();
+    
+    owner.transfer(msg.value);
   }
 
   /// @notice Allows contract owner to mint tokens at any time
@@ -76,11 +76,6 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 differenceFactor = (10**_nativeDecimals) / (10**_decimals);
     return _weiAmount.mul(_exchangeRate).div(differenceFactor);
   }
-
-  /// @dev Sends Ether to the contract owner
-  function forwardFunds() internal {
-    owner.transfer(msg.value);
-  } 
 
   /// @dev Mints new tokens
   /// @param _to Address to mint the tokens to
