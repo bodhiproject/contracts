@@ -19,7 +19,6 @@ contract BodhiToken is StandardToken, Ownable {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
   /// @notice Creates new BodhiToken contract
-  /// @param _exchangeRate The exchange rate of Ether to BOT
   function BodhiToken() public {
     assert(nativeDecimals >= decimals);
     mint(owner, tokenTotalSupply);
@@ -50,7 +49,7 @@ contract BodhiToken is StandardToken, Ownable {
 
   /// @notice Allows contract owner to mint tokens at any time
   /// @param _amount Amount of tokens to mint in lowest denomination of BOT
-  function mintReservedTokens(uint256 _amount) onlyOwner {
+  function mintReservedTokens(uint256 _amount) public onlyOwner {
     uint256 checkedSupply = totalSupply.add(_amount);
     require(checkedSupply <= tokenTotalSupply);
 
@@ -68,6 +67,7 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 _exchangeRate,
     uint256 _nativeDecimals, 
     uint256 _decimals) 
+    public
     constant 
     returns(uint256) 
   {
