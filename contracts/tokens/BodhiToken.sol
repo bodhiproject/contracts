@@ -43,17 +43,8 @@ contract BodhiToken is StandardToken, Ownable {
 
     mint(_beneficiary, tokenAmount);
     TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
-    
+
     owner.transfer(msg.value);
-  }
-
-  /// @notice Allows contract owner to mint tokens at any time
-  /// @param _amount Amount of tokens to mint in lowest denomination of BOT
-  function mintReservedTokens(uint256 _amount) public onlyOwner {
-    uint256 checkedSupply = totalSupply.add(_amount);
-    require(checkedSupply <= tokenTotalSupply);
-
-    mint(owner, _amount);
   }
 
   /// @notice Shows the amount of BOT the user will receive for amount of exchanged wei
