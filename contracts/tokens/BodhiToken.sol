@@ -7,18 +7,11 @@ contract BodhiToken is StandardToken, Ownable {
   // Token configurations
   string public constant name = "Bodhi Token";
   string public constant symbol = "BOT";
-  uint256 public constant nativeDecimals = 18;
   uint256 public constant decimals = 18;
+  uint256 public constant nativeDecimals = 18;
 
-  /// @notice 60 million BOT tokens for sale
-  uint256 public constant saleAmount = 60 * (10**6) * (10**decimals);
-
-  /// @notice 100 million BOT tokens will ever be created
+  // 100 million BOT tokens will only ever be created.
   uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
-
-  // Crowdsale parameters
-  uint256 public fundingStartBlock;
-  uint256 public fundingEndBlock;
   uint256 public initialExchangeRate;
 
   // Events
@@ -32,38 +25,18 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   modifier validPurchase() {
-    require(block.number >= fundingStartBlock);
-    require(block.number <= fundingEndBlock);
     require(msg.value > 0);
     _;
   }
 
   /// @notice Creates new BodhiToken contract
-  /// @param _fundingStartBlock The starting block of crowdsale
-  /// @param _fundingEndBlock The ending block of crowdsale
   /// @param _initialExchangeRate The exchange rate of Ether to BOT
-  /// @param _presaleAmount The amount of BOT that will be available for presale
-  function BodhiToken(
-    uint256 _fundingStartBlock,
-    uint256 _fundingEndBlock,
-    uint256 _initialExchangeRate,
-    uint256 _presaleAmount) {
-    require(_fundingStartBlock >= block.number);
-    require(_fundingEndBlock >= _fundingStartBlock);
+  function BodhiToken(uint256 _initialExchangeRate) public {
+    assert(nativeDecimals >= decimals);
     require(_initialExchangeRate > 0);
 
-    // Converted to lowest denomination of BOT
-    uint256 presaleAmountTokens = _presaleAmount * (10**decimals);
-    require(presaleAmountTokens <= saleAmount);
-    
-    assert(nativeDecimals >= decimals);
-
-    fundingStartBlock = _fundingStartBlock;
-    fundingEndBlock = _fundingEndBlock;
     initialExchangeRate = _initialExchangeRate;
 
-    // Mint the presale tokens, distribute to a receiver
-    // Increase the totalSupply accordingly
     mint(owner, presaleAmountTokens);
   }
 
