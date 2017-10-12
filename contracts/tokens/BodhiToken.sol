@@ -12,7 +12,7 @@ contract BodhiToken is StandardToken, Ownable {
 
   // 100 million BOT tokens will only ever be created.
   uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
-  uint256 public initialExchangeRate;
+  uint256 public exchangeRate;
 
   // Events
   event Mint(uint256 supply, address indexed to, uint256 amount);
@@ -30,12 +30,12 @@ contract BodhiToken is StandardToken, Ownable {
   }
 
   /// @notice Creates new BodhiToken contract
-  /// @param _initialExchangeRate The exchange rate of Ether to BOT
-  function BodhiToken(uint256 _initialExchangeRate) public {
+  /// @param _exchangeRate The exchange rate of Ether to BOT
+  function BodhiToken(uint256 _exchangeRate) public {
     assert(nativeDecimals >= decimals);
-    require(_initialExchangeRate > 0);
+    require(_exchangeRate > 0);
 
-    initialExchangeRate = _initialExchangeRate;
+    exchangeRate = _exchangeRate;
 
     mint(owner, presaleAmountTokens);
   }
@@ -52,7 +52,7 @@ contract BodhiToken is StandardToken, Ownable {
     validAddress(_beneficiary) 
     validPurchase
   {
-    uint256 tokenAmount = getTokenExchangeAmount(msg.value, initialExchangeRate, nativeDecimals, decimals);
+    uint256 tokenAmount = getTokenExchangeAmount(msg.value, exchangeRate, nativeDecimals, decimals);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
     // Ensure new token increment does not exceed the sale amount
