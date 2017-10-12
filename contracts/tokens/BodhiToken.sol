@@ -1,4 +1,4 @@
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.15;
 
 import './StandardToken.sol';
 import '../libs/Ownable.sol';
@@ -10,9 +10,9 @@ contract BodhiToken is StandardToken, Ownable {
   uint256 public constant decimals = 18;
   uint256 public constant nativeDecimals = 18;
 
-  // 100 million BOT tokens will only ever be created.
-  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
-  uint256 public exchangeRate;
+  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT ever created
+  uint256 public constant maxTokensForSale = 60 * (10**6) * (10**decimals); // Max number of tokens for sale
+  uint256 public constant exchangeRate = 100; // 100 BOT per native token
 
   // Events
   event Mint(uint256 supply, address indexed to, uint256 amount);
@@ -20,13 +20,9 @@ contract BodhiToken is StandardToken, Ownable {
 
   /// @notice Creates new BodhiToken contract
   /// @param _exchangeRate The exchange rate of Ether to BOT
-  function BodhiToken(uint256 _exchangeRate) public {
+  function BodhiToken() public {
     assert(nativeDecimals >= decimals);
-    require(_exchangeRate > 0);
-
-    exchangeRate = _exchangeRate;
-
-    mint(owner, presaleAmountTokens);
+    mint(owner, tokenTotalSupply);
   }
 
   /// @notice Fallback function to purchase tokens
@@ -39,7 +35,7 @@ contract BodhiToken is StandardToken, Ownable {
   function buyTokens(address _beneficiary) public payable {
     require(_beneficiary != address(0));
     require(msg.value > 0);
-    
+
     uint256 tokenAmount = getTokenExchangeAmount(msg.value, exchangeRate, nativeDecimals, decimals);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
