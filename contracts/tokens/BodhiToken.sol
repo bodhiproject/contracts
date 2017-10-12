@@ -18,17 +18,6 @@ contract BodhiToken is StandardToken, Ownable {
   event Mint(uint256 supply, address indexed to, uint256 amount);
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  // Modifiers
-  modifier validAddress(address _address) {
-    require(_address != 0x0);
-    _;
-  }
-
-  modifier validPurchase() {
-    require(msg.value > 0);
-    _;
-  }
-
   /// @notice Creates new BodhiToken contract
   /// @param _exchangeRate The exchange rate of Ether to BOT
   function BodhiToken(uint256 _exchangeRate) public {
@@ -47,11 +36,10 @@ contract BodhiToken is StandardToken, Ownable {
 
   /// @notice Allows buying tokens from different address than msg.sender
   /// @param _beneficiary Address that will contain the purchased tokens
-  function buyTokens(address _beneficiary) 
-    payable 
-    validAddress(_beneficiary) 
-    validPurchase
-  {
+  function buyTokens(address _beneficiary) public payable {
+    require(_beneficiary != address(0));
+    require(msg.value > 0);
+    
     uint256 tokenAmount = getTokenExchangeAmount(msg.value, exchangeRate, nativeDecimals, decimals);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
