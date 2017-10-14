@@ -43,17 +43,15 @@ contract('BodhiToken', function(accounts) {
       assert.equal(exchangeRate.toString(), expectedExchangeRate.toString(), "exchangeRate does not match");
     });
 
-    it("should mint presale token and allocate to the owner", async function() {
+    it("should mint reserve tokens to the owner", async function() {
       let decimals = await token.decimals();
-      let ownerBalance = await token.balanceOf(owner);
-      let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
-      assert.equal(ownerBalance.toString(), expectedPresaleAmount.toString(), 
-        "Owner balance does not match presale amount.");
 
-      // Assert the supply is updated
-      let totalSupply = await token.totalSupply();
-      assert.equal(totalSupply.toString(), expectedPresaleAmount.toString(), 
-        "Total supply does not match the presale amount.");
+      let ownerBalance = await token.balanceOf(owner);
+      let expectedBalance = Utils.getBigNumberWithDecimals(40e6, decimals);
+      assert.equal(ownerBalance.toString(), expectedBalance.toString(), "ownerBalance does not match reserve amount");
+
+      let totalSupply = await token.totalSupply.call();
+      assert.equal(totalSupply.toString(), expectedBalance.toString(), "totalSupply does not match the reserve amount");
     });
   });
 
