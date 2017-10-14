@@ -12,20 +12,24 @@ const requester = bluebird.promisifyAll(web3.eth);
  * Run the script 'testrpc_high_value.sh' to start TestRPC with 4 high value accounts.
  */
 contract('BodhiToken', function(accounts) {
-  const regexInvalidOpcode = /invalid opcode/;
-
   const blockHeightManager = new BlockHeightManager(web3);
+  const regexInvalidOpcode = /invalid opcode/;
   const validPurchaseBlock = (config.startBlock + config.endBlock) / 2;
+  const owner = accounts[0];
+
+  let token;
 
   before(blockHeightManager.snapshot);
   afterEach(blockHeightManager.revert);
 
+  beforeEach(async function() {
+    token = await BodhiToken.deployed({ from: owner });
+  })
+
   describe("Initialization", async function() {
     it('initializes all the values', async function() {
-      let token = await BodhiToken.deployed();
       let decimals = await token.decimals.call();
-
-      let tokenTotalSupply = await token.tokenTotalSupply.call();
+      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
       let expectedTotalTokenSupply = Utils.getBigNumberWithDecimals(100e6, decimals);
       assert.equal(tokenTotalSupply.toString(), expectedTotalTokenSupply.toString(), 
         "tokenTotalSupply does not match");
@@ -51,11 +55,13 @@ contract('BodhiToken', function(accounts) {
       let ownerBalance = await token.balanceOf(owner);
       let decimals = await token.decimals();
       let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
-      assert.equal(ownerBalance.toString(), expectedPresaleAmount.toString(), "Owner balance does not match presale amount.");
+      assert.equal(ownerBalance.toString(), expectedPresaleAmount.toString(), 
+        "Owner balance does not match presale amount.");
 
       // Assert the supply is updated
       let totalSupply = await token.totalSupply();
-      assert.equal(totalSupply.toString(), expectedPresaleAmount.toString(), "Total supply does not match the presale amount.");
+      assert.equal(totalSupply.toString(), expectedPresaleAmount.toString(), 
+        "Total supply does not match the presale amount.");
     });
   });
 
