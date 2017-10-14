@@ -59,7 +59,7 @@ contract BodhiToken is StandardToken, Ownable {
     uint256 _nativeDecimals, 
     uint256 _decimals) 
     public
-    constant 
+    view 
     returns(uint256) 
   {
     require(_weiAmount > 0);

@@ -1,5 +1,6 @@
 const BodhiToken = artifacts.require("./BodhiToken.sol");
 const BlockHeightManager = require('./helpers/block_height_manager');
+const Utils = require('./helpers/utils');
 const config = require('../config/config')(web3);
 const assert = require('chai').assert;
 const bluebird = require('bluebird');
@@ -19,31 +20,27 @@ contract('BodhiToken', function(accounts) {
   before(blockHeightManager.snapshot);
   afterEach(blockHeightManager.revert);
 
-  describe("Initialization", () => {
-    it('initializes all the values', async () => {
+  describe("Initialization", async function() {
+    it('initializes all the values', async function() {
       let token = await BodhiToken.deployed();
+      let decimals = await token.decimals.call();
 
-      let fundingStartBlock = await token.fundingStartBlock();
-      assert.equal(fundingStartBlock, config.startBlock, "Funding start block does not match.");
+      let tokenTotalSupply = await token.tokenTotalSupply.call();
+      let expectedTotalTokenSupply = Utils.getBigNumberWithDecimals(100e6, decimals);
+      assert.equal(tokenTotalSupply.toString(), expectedTotalTokenSupply.toString(), 
+        "tokenTotalSupply does not match");
 
-      let fundingEndBlock = await token.fundingEndBlock();
-      assert.equal(fundingEndBlock, config.endBlock, "Funding end block does not match.");
+      let saleAmount = await token.saleAmount();
+      let expectedSaleAmount = Utils.getBigNumberWithDecimals(60e6, decimals);
+      assert.equal(saleAmount.toString(), expectedSaleAmount.toString(), "Sale amount does not match");
 
-      assert(fundingEndBlock > fundingStartBlock, "Funding end block is before funding start block.");
-      assert.equal(await token.initialExchangeRate(), config.initialExchangeRate, "Initial exchange rate does not match.");
+      let exchangeRate = await token.exchangeRate();
+      let expectedExchangeRate = 100;
+      assert.equal(exchangeRate.toString(), expectedExchangeRate.toString(), "exchangeRate does not match");
 
-      let decimals = await token.decimals();
-      let maxTokenForSale = web3.toBigNumber(await token.saleAmount());
-      let expectedSaleAmount = web3.toBigNumber(60e6 * Math.pow(10, decimals));
-      assert.equal(maxTokenForSale.toString(), expectedSaleAmount.toString(), "Sale amount does not match.");
-
-      let totalTokenSupply = web3.toBigNumber(await token.tokenTotalSupply());
-      let expectedTotalTokenSupply = web3.toBigNumber(100e6 * Math.pow(10, decimals));
-      assert.equal(totalTokenSupply.toString(), expectedTotalTokenSupply.toString(), "Total token supply does not match.");
-
-      let totalSupply = web3.toBigNumber(await token.totalSupply());
-      let expectedTotalSupply = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
-      assert.equal(totalSupply.toString(), expectedTotalSupply.toString());
+      let totalSupply = await token.totalSupply();
+      let expectedTotalSupply = Utils.getBigNumberWithDecimals(100e6, decimals);
+      assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "totalSupply does not match");
     });
 
     it("should mint presale token and allocate to the owner", async function() {
