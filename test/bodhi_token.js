@@ -48,12 +48,8 @@ contract('BodhiToken', function(accounts) {
     });
 
     it("should mint presale token and allocate to the owner", async function() {
-      let token = await BodhiToken.deployed();
-
-      // Assert the presale allocation
-      let owner = await token.owner();
-      let ownerBalance = await token.balanceOf(owner);
       let decimals = await token.decimals();
+      let ownerBalance = await token.balanceOf(owner);
       let expectedPresaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
       assert.equal(ownerBalance.toString(), expectedPresaleAmount.toString(), 
         "Owner balance does not match presale amount.");

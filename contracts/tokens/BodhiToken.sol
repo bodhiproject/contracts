@@ -21,7 +21,12 @@ contract BodhiToken is StandardToken, Ownable {
   /// @notice Creates new BodhiToken contract
   function BodhiToken() public {
     assert(nativeDecimals >= decimals);
-    mint(owner, tokenTotalSupply);
+
+    // Mint 40 million BOT for reserve purposes
+    uint256 reserveAmount = tokenTotalSupply.sub(saleAmount);
+    assert(reserveAmount.add(saleAmount) == tokenTotalSupply);
+
+    mint(owner, reserveAmount);
   }
 
   /// @notice Fallback function to purchase tokens
