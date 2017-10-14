@@ -18,40 +18,41 @@ contract('BodhiToken', function(accounts) {
   const owner = accounts[0];
 
   let token;
+  let decimals;
 
   before(blockHeightManager.snapshot);
   afterEach(blockHeightManager.revert);
 
   beforeEach(async function() {
     token = await BodhiToken.deployed({ from: owner });
+    decimals = await token.decimals.call();
   })
 
   describe("Initialization", async function() {
     it('initializes all the values', async function() {
-      let decimals = await token.decimals.call();
+      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
+      let expectedTokenTotalSupply = Utils.getBigNumberWithDecimals(100e6, decimals);
+      assert.equal(tokenTotalSupply.toString(), expectedTokenTotalSupply.toString(), "tokenTotalSupply does not match");
 
-      let totalSupply = await token.totalSupply.call(); 
-      let expectedTotalSupply = Utils.getBigNumberWithDecimals(40e6, decimals);
-      assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "totalSupply does not match");
-
-      let saleAmount = await token.saleAmount();
+      let saleAmount = await token.saleAmount.call();
       let expectedSaleAmount = Utils.getBigNumberWithDecimals(60e6, decimals);
-      assert.equal(saleAmount.toString(), expectedSaleAmount.toString(), "Sale amount does not match");
+      assert.equal(saleAmount.toString(), expectedSaleAmount.toString(), "saleAmount does not match");
 
-      let exchangeRate = await token.exchangeRate();
+      let exchangeRate = await token.exchangeRate.call();
       let expectedExchangeRate = 100;
       assert.equal(exchangeRate.toString(), expectedExchangeRate.toString(), "exchangeRate does not match");
     });
 
     it("should mint reserve tokens to the owner", async function() {
-      let decimals = await token.decimals();
+      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
+      let saleAmount = await token.saleAmount.call();
+      let reserveAmount = tokenTotalSupply.sub(saleAmount);
 
       let ownerBalance = await token.balanceOf(owner);
-      let expectedBalance = Utils.getBigNumberWithDecimals(40e6, decimals);
-      assert.equal(ownerBalance.toString(), expectedBalance.toString(), "ownerBalance does not match reserve amount");
+      assert.equal(ownerBalance.toString(), reserveAmount.toString(), "ownerBalance does not match reserve amount");
 
       let totalSupply = await token.totalSupply.call();
-      assert.equal(totalSupply.toString(), expectedBalance.toString(), "totalSupply does not match the reserve amount");
+      assert.equal(totalSupply.toString(), reserveAmount.toString(), "totalSupply does not match the reserve amount");
     });
   });
 
