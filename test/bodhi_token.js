@@ -29,10 +29,10 @@ contract('BodhiToken', function(accounts) {
   describe("Initialization", async function() {
     it('initializes all the values', async function() {
       let decimals = await token.decimals.call();
-      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
-      let expectedTotalTokenSupply = Utils.getBigNumberWithDecimals(100e6, decimals);
-      assert.equal(tokenTotalSupply.toString(), expectedTotalTokenSupply.toString(), 
-        "tokenTotalSupply does not match");
+
+      let totalSupply = await token.totalSupply.call(); 
+      let expectedTotalSupply = Utils.getBigNumberWithDecimals(40e6, decimals);
+      assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "totalSupply does not match");
 
       let saleAmount = await token.saleAmount();
       let expectedSaleAmount = Utils.getBigNumberWithDecimals(60e6, decimals);
@@ -41,10 +41,6 @@ contract('BodhiToken', function(accounts) {
       let exchangeRate = await token.exchangeRate();
       let expectedExchangeRate = 100;
       assert.equal(exchangeRate.toString(), expectedExchangeRate.toString(), "exchangeRate does not match");
-
-      let totalSupply = await token.totalSupply();
-      let expectedTotalSupply = Utils.getBigNumberWithDecimals(100e6, decimals);
-      assert.equal(totalSupply.toString(), expectedTotalSupply.toString(), "totalSupply does not match");
     });
 
     it("should mint presale token and allocate to the owner", async function() {
