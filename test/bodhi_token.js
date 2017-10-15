@@ -33,31 +33,11 @@ contract('BodhiToken', function(accounts) {
       let tokenTotalSupply = await token.tokenTotalSupply.call(); 
       let expectedTokenTotalSupply = Utils.getBigNumberWithDecimals(100e6, decimals);
       assert.equal(tokenTotalSupply.toString(), expectedTokenTotalSupply.toString(), "tokenTotalSupply does not match");
-
-      let saleAmount = await token.saleAmount.call();
-      let expectedSaleAmount = Utils.getBigNumberWithDecimals(60e6, decimals);
-      assert.equal(saleAmount.toString(), expectedSaleAmount.toString(), "saleAmount does not match");
-
-      let exchangeRate = await token.exchangeRate.call();
-      let expectedExchangeRate = 100;
-      assert.equal(exchangeRate.toString(), expectedExchangeRate.toString(), "exchangeRate does not match");
-    });
-
-    it("should mint reserve tokens to the owner", async function() {
-      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
-      let saleAmount = await token.saleAmount.call();
-      let reserveAmount = tokenTotalSupply.sub(saleAmount);
-
-      let ownerBalance = await token.balanceOf(owner);
-      assert.equal(ownerBalance.toString(), reserveAmount.toString(), "ownerBalance does not match reserve amount");
-
-      let totalSupply = await token.totalSupply.call();
-      assert.equal(totalSupply.toString(), reserveAmount.toString(), "totalSupply does not match the reserve amount");
     });
   });
 
-  describe("Minting", () => {
-    it.only('allows only the owner of the contract to mint reserved tokens', async () => {
+  describe.only("Minting", () => {
+    it('allows only the owner of the contract to mint reserved tokens', async () => {
       var totalSupply = await token.totalSupply();
       let tokenTotalSupply = await token.tokenTotalSupply.call(); 
       let saleAmount = await token.saleAmount.call();
