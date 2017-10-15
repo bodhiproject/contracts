@@ -36,111 +36,59 @@ contract('BodhiToken', function(accounts) {
     });
   });
 
-  describe.only("Minting", () => {
-    it('allows only the owner of the contract to mint reserved tokens', async () => {
-      var totalSupply = await token.totalSupply();
-      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
-      let saleAmount = await token.saleAmount.call();
-      let reserveAmount = tokenTotalSupply.sub(saleAmount);
-      assert.equal(totalSupply.toString(), reserveAmount.toString(), "totalSupply should equal reserve amount");
+  describe("Minting", () => {
+    it('allows only the owner to mint tokens', async () => {
+      var totalSupply = await token.totalSupply.call();
+      assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
 
-      await token.mintReservedTokens(saleAmount, {from: owner });
+      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
+      await token.mint(owner, tokenTotalSupply, {from: owner });
 
       totalSupply = await token.totalSupply();
       assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
     });
 
-    it('does not allow an address other than the owner to mint reserved tokens', async () => {
-      let token = await BodhiToken.deployed();
-
-      let decimals = await token.decimals();
-      let initialSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
-      assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
-
+    it('does not allow an address other than the owner to mint tokens', async () => {
+      var totalSupply = await token.totalSupply.call();
+      assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
+      
       try {
-        let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
-        await token.mintReservedTokens(mintedTokenAmount, {from: accounts[1]});
+        await token.mint(accounts[1], 1, { from: accounts[1] });
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
       }
 
-      let actualMintSupply = web3.toBigNumber(await token.totalSupply());
-      assert.equal(actualMintSupply.toString(), initialSupply.toString(), "Expected total supply does not match.");
-    });
-
-    it('should be able to mint the reserved portion to the owner', async() => {
-      let token = await BodhiToken.deployed();
-      let totalSupply = await token.totalSupply();
-      let owner = await token.owner();
-      let maxTokenSupply = await token.tokenTotalSupply();
-
-      let balanceBefore = await token.balanceOf(owner);
-      let residualTokens = maxTokenSupply.sub(totalSupply);
-
-      await token.mintReservedTokens(residualTokens);
-
-      let balanceAfter = await token.balanceOf(owner);
-      assert.equal(balanceBefore.add(residualTokens).valueOf(), balanceAfter.valueOf());
-    });
-
-    it('allows owner to mint reserved tokens after the end block has been reached', async () => {
-      let token = await BodhiToken.deployed();
-
-      let decimals = await token.decimals();
-      let initialSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
-      assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
-
-      await blockHeightManager.mineTo(config.endBlock + 1);
-      assert.isAbove(await requester.getBlockNumberAsync(), config.endBlock);
-
-      let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
-      await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
-
-      let actualTotalSupply = web3.toBigNumber(await token.totalSupply());
-      let expectedTotalSupply = initialSupply.add(mintedTokenAmount);
-      assert.equal(actualTotalSupply.toString(), expectedTotalSupply.toString(), "Total supply does not match.");
-    });
-
-    it('allows minting if it does not exceed the total token supply', async () => {
-      let token = await BodhiToken.deployed();
-
-      let decimals = await token.decimals();
-      let initialSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
-      assert.equal(initialSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
-
-      let maxTokenSupply = await token.tokenTotalSupply();
-      let maxMintAmount = maxTokenSupply.sub(initialSupply);
-      await token.mintReservedTokens(maxMintAmount, {from: accounts[0]});
-
-      let actualTotalSupply = web3.toBigNumber(await token.totalSupply());
-      let expectedTotalSupply = initialSupply.add(maxMintAmount);
-      assert.equal(actualTotalSupply.toString(), expectedTotalSupply.toString(), "Expected total supply does not match.");
-      assert.equal(actualTotalSupply.toString(), maxTokenSupply.toString(), "Token supply should equal total token supply.");
-    });
-
-    it('does not allow minting if it exceeds the total token supply', async () => {
-      let token = await BodhiToken.deployed();
-
-      let decimals = await token.decimals();
-      let beforeTotalSupply = web3.toBigNumber(await token.totalSupply());
-      let presaleAmount = web3.toBigNumber(config.presaleAmount * Math.pow(10, decimals));
-      assert.equal(beforeTotalSupply.toString(), presaleAmount.toString(), "Initial supply should match presale amount.");
-
       try {
-        let maxTokenSupply = await token.tokenTotalSupply();
-        let overflowAmount = maxTokenSupply.sub(beforeTotalSupply).add(1);
-        await token.mintReservedTokens(overflowAmount, {from: accounts[0]});
+        await token.mint(accounts[2], 1, { from: accounts[2] });
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
       }
 
-      let afterTotalSupply = web3.toBigNumber(await token.totalSupply());
-      assert.equal(afterTotalSupply.toString(), beforeTotalSupply.toString(), "Total supply does not match.");
+      totalSupply = await token.totalSupply.call();
+      assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
+    });
+
+    it('throws if trying to mint more than the tokenTotalSupply', async () => {
+      var totalSupply = await token.totalSupply.call();
+      assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
+
+      let tokenTotalSupply = await token.tokenTotalSupply.call(); 
+      await token.mint(owner, tokenTotalSupply, {from: owner });
+
+      totalSupply = await token.totalSupply();
+      assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
+
+      try {
+        await token.mint(owner, 1, { from: owner });
+        assert.fail();
+      } catch(e) {
+        assert.match(e.toString(), regexInvalidOpcode);
+      }
+
+      totalSupply = await token.totalSupply();
+      assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
     });
   });
 
