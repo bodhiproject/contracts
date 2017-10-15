@@ -1,20 +1,12 @@
 const BodhiToken = artifacts.require("./BodhiToken.sol");
 const BlockHeightManager = require('./helpers/block_height_manager');
 const Utils = require('./helpers/utils');
-const config = require('../config/config')(web3);
 const assert = require('chai').assert;
 const bluebird = require('bluebird');
 
-const requester = bluebird.promisifyAll(web3.eth);
-
-/**
- * One of the tests requires high value accounts (containing 400k Ether).
- * Run the script 'testrpc_high_value.sh' to start TestRPC with 4 high value accounts.
- */
 contract('BodhiToken', function(accounts) {
   const blockHeightManager = new BlockHeightManager(web3);
   const regexInvalidOpcode = /invalid opcode/;
-  const validPurchaseBlock = (config.startBlock + config.endBlock) / 2;
   const owner = accounts[0];
 
   let token;
@@ -44,13 +36,13 @@ contract('BodhiToken', function(accounts) {
       let tokenTotalSupply = await token.tokenTotalSupply.call(); 
       await token.mint(owner, tokenTotalSupply, {from: owner });
 
-      totalSupply = await token.totalSupply();
+      totalSupply = await token.totalSupply.call();
       assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
     });
 
     it('does not allow an address other than the owner to mint tokens', async () => {
       var totalSupply = await token.totalSupply.call();
-      assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
+      assert.equal(totalSupply.toString(), 0, "totalSupply should be 0");
       
       try {
         await token.mint(accounts[1], 1, { from: accounts[1] });
@@ -67,17 +59,17 @@ contract('BodhiToken', function(accounts) {
       }
 
       totalSupply = await token.totalSupply.call();
-      assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
+      assert.equal(totalSupply.toString(), 0, "totalSupply should be 0");
     });
 
     it('throws if trying to mint more than the tokenTotalSupply', async () => {
       var totalSupply = await token.totalSupply.call();
-      assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
+      assert.equal(totalSupply.toString(), 0, "totalSupply should be 0");
 
       let tokenTotalSupply = await token.tokenTotalSupply.call(); 
       await token.mint(owner, tokenTotalSupply, {from: owner });
 
-      totalSupply = await token.totalSupply();
+      totalSupply = await token.totalSupply.call();
       assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
 
       try {
@@ -87,7 +79,7 @@ contract('BodhiToken', function(accounts) {
         assert.match(e.toString(), regexInvalidOpcode);
       }
 
-      totalSupply = await token.totalSupply();
+      totalSupply = await token.totalSupply.call();
       assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
     });
   });
