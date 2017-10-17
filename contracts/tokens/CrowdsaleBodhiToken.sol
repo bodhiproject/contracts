@@ -1,7 +1,6 @@
 pragma solidity ^0.4.17;
 
-import './StandardToken.sol';
-import '../libs/Ownable.sol';
+import './BodhiToken.sol';
 
 contract CrowdsaleBodhiToken is BodhiToken {
   uint256 public constant nativeDecimals = 18;
@@ -53,15 +52,12 @@ contract CrowdsaleBodhiToken is BodhiToken {
 
   /// @notice Allows buying tokens from different address than msg.sender
   /// @param _beneficiary Address that will contain the purchased tokens
-  function buyTokens(address _beneficiary) 
-    payable 
-    validPurchase
-  {
+  function buyTokens(address _beneficiary) payable {
     require(_beneficiary != address(0));
     require(block.number >= fundingStartBlock);
     require(block.number <= fundingEndBlock);
     require(msg.value > 0);
-    
+
     uint256 tokenAmount = getTokenExchangeAmount(msg.value, initialExchangeRate, nativeDecimals, decimals);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
