@@ -16,7 +16,7 @@ addons:
 
 install:
   - npm install -g ethereumjs-testrpc
-  - npm install -g truffle
+  - npm install -g truffle@^4.0.0-beta.2
   - npm install
 
 script:
