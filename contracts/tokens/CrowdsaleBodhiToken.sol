@@ -44,7 +44,7 @@ contract CrowdsaleBodhiToken is BodhiToken {
 
         // Mint the presale tokens, distribute to a receiver
         // Increase the totalSupply accordingly
-        mint(owner, presaleAmountTokens);
+        mintByOwner(owner, presaleAmountTokens);
     }
 
     /// @notice Fallback function to purchase tokens
@@ -66,7 +66,7 @@ contract CrowdsaleBodhiToken is BodhiToken {
         // Ensure new token increment does not exceed the sale amount
         assert(checkedSupply <= saleAmount);
 
-        mint(_beneficiary, tokenAmount);
+        mintByPurchaser(_beneficiary, tokenAmount);
         TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
 
         owner.transfer(msg.value);
@@ -91,5 +91,13 @@ contract CrowdsaleBodhiToken is BodhiToken {
 
         uint256 differenceFactor = (10**_nativeDecimals) / (10**_decimals);
         return _weiAmount.mul(_exchangeRate).div(differenceFactor);
+    }
+
+    /// @dev Function to allow crowdsale participants to mint tokens when purchasing
+    /// @param _to Address to mint the tokens to
+    /// @param _amount Amount of tokens that will be minted
+    /// @return Boolean to signify successful minting
+    function mintByPurchaser(address _to, uint256 _amount) private returns (bool) {
+        return mint(_to, _amount);
     }
 }

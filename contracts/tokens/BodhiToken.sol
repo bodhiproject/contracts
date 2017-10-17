@@ -18,11 +18,15 @@ contract BodhiToken is StandardToken, Ownable {
     function BodhiToken() public {
     }
 
+    /// @notice Allows the owner to mint new tokens
+    /// @param _to Address to mint the tokens to
+    /// @param _amount Amount of tokens that will be minted
+    /// @return Boolean to signify successful minting
     function mintByOwner(address _to, uint256 _amount) public onlyOwner returns (bool) {
         return mint(_to, _amount);
     }
 
-    /// @notice Allows the owner to mint new tokens
+    /// @dev Mint new tokens
     /// @param _to Address to mint the tokens to
     /// @param _amount Amount of tokens that will be minted
     /// @return Boolean to signify successful minting
