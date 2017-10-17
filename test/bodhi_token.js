@@ -34,7 +34,7 @@ contract('BodhiToken', function(accounts) {
       assert.equal(totalSupply.toString(), 0, "Initial totalSupply should be 0");
 
       let tokenTotalSupply = await token.tokenTotalSupply.call(); 
-      await token.mint(owner, tokenTotalSupply, {from: owner });
+      await token.mintByOwner(owner, tokenTotalSupply, { from: owner });
 
       totalSupply = await token.totalSupply.call();
       assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
@@ -45,14 +45,14 @@ contract('BodhiToken', function(accounts) {
       assert.equal(totalSupply.toString(), 0, "totalSupply should be 0");
       
       try {
-        await token.mint(accounts[1], 1, { from: accounts[1] });
+        await token.mintByOwner(accounts[1], 1, { from: accounts[1] });
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
       }
 
       try {
-        await token.mint(accounts[2], 1, { from: accounts[2] });
+        await token.mintByOwner(accounts[2], 1, { from: accounts[2] });
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
@@ -67,13 +67,13 @@ contract('BodhiToken', function(accounts) {
       assert.equal(totalSupply.toString(), 0, "totalSupply should be 0");
 
       let tokenTotalSupply = await token.tokenTotalSupply.call(); 
-      await token.mint(owner, tokenTotalSupply, {from: owner });
+      await token.mintByOwner(owner, tokenTotalSupply, {from: owner });
 
       totalSupply = await token.totalSupply.call();
       assert.equal(totalSupply.toString(), tokenTotalSupply.toString(), "totalSupply should equal tokenTotalSupply");
 
       try {
-        await token.mint(owner, 1, { from: owner });
+        await token.mintByOwner(owner, 1, { from: owner });
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
