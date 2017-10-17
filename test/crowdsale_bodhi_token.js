@@ -17,6 +17,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
   let token;
   let decimals;
+  let nativeDecimals;
 
   before(blockHeightManager.snapshot);
   afterEach(blockHeightManager.revert);
@@ -24,6 +25,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
   beforeEach(async function() {
     token = await CrowdsaleBodhiToken.deployed();
     decimals = await token.decimals.call();
+    nativeDecimals = await token.nativeDecimals.call();
   });
 
   describe("Initialization", () => {
@@ -171,7 +173,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
       try {
         let from = accounts[1];
-        let nativeDecimals = await token.nativeDecimals();
         let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
         await token.buyTokens(from, {value: exchangeTokenWei});
@@ -187,7 +188,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
       try {
         let from = accounts[1];
-        let nativeDecimals = await token.nativeDecimals();
         let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
         await token.buyTokens(from, {value: exchangeTokenWei});
@@ -201,7 +201,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1];
-      let nativeDecimals = await token.nativeDecimals();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(from, {value: exchangeTokenWei});
       
@@ -237,7 +236,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       assert.isAtMost(blockNumber, config.endBlock);
 
       let from = accounts[1];
-      let nativeDecimals = await token.nativeDecimals();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
       await requester.sendTransactionAsync({
@@ -257,7 +255,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
       let purchaser = accounts[1];
       let beneficiary = accounts[2];
-      let nativeDecimals = await token.nativeDecimals();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(beneficiary, {from: purchaser, value: exchangeTokenWei});
       
@@ -277,7 +274,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
       let purchaser = accounts[1];
       let beneficiary = accounts[1];
-      let nativeDecimals = await token.nativeDecimals();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(beneficiary, {from: purchaser, value: exchangeTokenWei});
 
@@ -301,7 +297,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
       // Reverse the logic for getTokenExchangeAmount()
       let exchangeRate = await token.initialExchangeRate();
-      let nativeDecimals = await token.nativeDecimals();
       let differenceFactor = Math.pow(10, nativeDecimals) / Math.pow(10, decimals);
       var exchangeTokenWei = maxPurchaseTokens / exchangeRate * differenceFactor;
 
@@ -334,7 +329,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       await blockHeightManager.mineTo(validPurchaseBlock);
 
       let from = accounts[1];
-      let nativeDecimals = await token.nativeDecimals();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       await token.buyTokens(from, {from: from, value: exchangeTokenWei});
 
@@ -350,7 +344,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       await blockHeightManager.mineTo(config.startBlock - 5);
 
       let from = accounts[1];
-      let nativeDecimals = await token.nativeDecimals();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
 
       try {
@@ -367,7 +360,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
   describe('Exchange', () => {
     it('returns the correct exchange amount using the contract defined values', async() => {
-      let nativeDecimals = await token.nativeDecimals();
       let exchangeRate = await token.initialExchangeRate();
       let exchangeTokenWei = 1 * Math.pow(10, nativeDecimals);
       let actualAmount = await token.getTokenExchangeAmount(exchangeTokenWei, exchangeRate, nativeDecimals, decimals);
@@ -477,7 +469,6 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
     it('should throw on a zero exchange amount', async () => {
       try {
-        let nativeDecimals = await token.nativeDecimals();
         let exchangeRate = await token.initialExchangeRate();
         let amount = await token.getTokenExchangeAmount(0, exchangeRate, nativeDecimals, decimals);
         assert.fail();
