@@ -1,7 +1,7 @@
 pragma solidity ^0.4.17;
 
 import './StandardToken.sol';
-import './Ownable.sol';
+import '../libs/Ownable.sol';
 
 contract CrowdsaleBodhiToken is StandardToken, Ownable {
   // Token configurations
