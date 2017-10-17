@@ -18,7 +18,7 @@ contract('BodhiToken', function(accounts) {
   beforeEach(async function() {
     token = await BodhiToken.deployed({ from: owner });
     decimals = await token.decimals.call();
-  })
+  });
 
   describe("Initialization", async function() {
     it('initializes all the values', async function() {

@@ -1,4 +1,4 @@
-const BodhiToken = artifacts.require("./CrowdsaleBodhiToken.sol");
+const CrowdsaleBodhiToken = artifacts.require("./CrowdsaleBodhiToken.sol");
 const BlockHeightManager = require('./helpers/block_height_manager');
 const config = require('../config/config')(web3);
 const assert = require('chai').assert;
@@ -10,7 +10,7 @@ const requester = bluebird.promisifyAll(web3.eth);
  * One of the tests requires high value accounts (containing 400k Ether).
  * Run the script 'testrpc_high_value.sh' to start TestRPC with 4 high value accounts.
  */
-contract('BodhiToken', function(accounts) {
+contract('CrowdsaleBodhiToken', function(accounts) {
   const regexInvalidOpcode = /invalid opcode/;
 
   const blockHeightManager = new BlockHeightManager(web3);
@@ -21,9 +21,9 @@ contract('BodhiToken', function(accounts) {
 
   describe("Initialization", () => {
     it('initializes all the values', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
-      let fundingStartBlock = await token.fundingStartBlock();
+      let fundingStartBlock = await token.fundingStartBlock;
       assert.equal(fundingStartBlock, config.startBlock, "Funding start block does not match.");
 
       let fundingEndBlock = await token.fundingEndBlock();
@@ -47,7 +47,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it("should mint presale token and allocate to the owner", async function() {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       // Assert the presale allocation
       let owner = await token.owner();
@@ -64,7 +64,7 @@ contract('BodhiToken', function(accounts) {
 
   describe("Minting", () => {
     it('allows only the owner of the contract to mint reserved tokens', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
@@ -80,7 +80,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('does not allow an address other than the owner to mint reserved tokens', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
@@ -100,7 +100,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('should be able to mint the reserved portion to the owner', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
       let totalSupply = await token.totalSupply();
       let owner = await token.owner();
       let maxTokenSupply = await token.tokenTotalSupply();
@@ -115,7 +115,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('allows owner to mint reserved tokens after the end block has been reached', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
@@ -134,7 +134,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('allows minting if it does not exceed the total token supply', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let decimals = await token.decimals();
       let initialSupply = web3.toBigNumber(await token.totalSupply());
@@ -152,7 +152,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('does not allow minting if it exceeds the total token supply', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let decimals = await token.decimals();
       let beforeTotalSupply = web3.toBigNumber(await token.totalSupply());
@@ -175,7 +175,7 @@ contract('BodhiToken', function(accounts) {
 
   describe('Purchasing', () => {
     it('reject buying token before startBlock', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       assert(await requester.getBlockNumberAsync() < config.startBlock, 
         'current block height should less than start block height');;
@@ -193,7 +193,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('reject buying token after endBlock', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       await blockHeightManager.mineTo(config.endBlock + 10);
       assert.isAtLeast(await requester.getBlockNumberAsync(), config.endBlock);
@@ -211,7 +211,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('accept buying token between start and end block', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
@@ -228,7 +228,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('reject zero value purchase', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
@@ -248,7 +248,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('uses the fallback function to buy tokens if buyToken() is not used', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
@@ -274,7 +274,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('allows an address to buy tokens on behalf of a beneficiary', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
@@ -295,7 +295,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('sends the balance to the correct address if the beneficiary is the purchaser', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       await blockHeightManager.mineTo(validPurchaseBlock);
 
@@ -313,7 +313,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('does not allow buying tokens once sale amount has been reached', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let decimals = await token.decimals();
       var totalSupply = web3.toBigNumber(await token.totalSupply());
@@ -356,7 +356,7 @@ contract('BodhiToken', function(accounts) {
 
   describe('Forwarding Funds', () => {
     it('should forward funds to the owner', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
       let owner = await token.owner();
       let beforeTransferBalance = web3.toBigNumber(await requester.getBalanceAsync(owner));
 
@@ -373,7 +373,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('should revert all funds if transaction is failed', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
       let owner = await token.owner();
       let beforeBalance = await requester.getBalanceAsync(owner);
 
@@ -397,7 +397,7 @@ contract('BodhiToken', function(accounts) {
 
   describe('Exchange', () => {
     it('returns the correct exchange amount using the contract defined values', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let nativeDecimals = await token.nativeDecimals();
       let decimals = await token.decimals();
@@ -410,7 +410,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 1 nativeToken, 100 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 100;
       let nativeDecimals = 8;
@@ -423,7 +423,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 1 nativeToken, 36 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 36;
       let nativeDecimals = 8;
@@ -436,7 +436,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 123 nativeTokens, 36 exchangeRate, 8 nativeDecimals, 8 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 36;
       let nativeDecimals = 8;
@@ -449,7 +449,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 1 nativeToken, 100 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 100;
       let nativeDecimals = 18;
@@ -462,7 +462,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 1 nativeToken, 36 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 36;
       let nativeDecimals = 18;
@@ -475,7 +475,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 123 nativeToken, 36 exchangeRate, 18 nativeDecimals, 8 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 36;
       let nativeDecimals = 18;
@@ -488,7 +488,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 1 nativeToken, 100 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 100;
       let nativeDecimals = 18;
@@ -501,7 +501,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 1 nativeToken, 36 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 36;
       let nativeDecimals = 18;
@@ -514,7 +514,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('returns the correct exchange amount for 123 nativeToken, 36 exchangeRate, 18 nativeDecimals, 18 decimals', async() => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       let exchangeRate = 36;
       let nativeDecimals = 18;
@@ -527,7 +527,7 @@ contract('BodhiToken', function(accounts) {
     });
 
     it('should throw on a zero exchange amount', async () => {
-      let token = await BodhiToken.deployed();
+      let token = await CrowdsaleBodhiToken.deployed();
 
       try {
         let nativeDecimals = await token.nativeDecimals();

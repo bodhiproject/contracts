@@ -38,12 +38,12 @@ contract CrowdsaleBodhiToken is StandardToken, Ownable {
     _;
   }
 
-  /// @notice Creates new BodhiToken contract
+  /// @notice Creates new CrowdsaleBodhiToken contract
   /// @param _fundingStartBlock The starting block of crowdsale
   /// @param _fundingEndBlock The ending block of crowdsale
   /// @param _initialExchangeRate The exchange rate of Ether to BOT
   /// @param _presaleAmount The amount of BOT that will be available for presale
-  function BodhiToken(
+  function CrowdsaleBodhiToken(
     uint256 _fundingStartBlock,
     uint256 _fundingEndBlock,
     uint256 _initialExchangeRate,
