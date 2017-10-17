@@ -3,18 +3,11 @@ pragma solidity ^0.4.17;
 import './StandardToken.sol';
 import '../libs/Ownable.sol';
 
-contract CrowdsaleBodhiToken is StandardToken, Ownable {
-  // Token configurations
-  string public constant name = "Bodhi Token";
-  string public constant symbol = "BOT";
+contract CrowdsaleBodhiToken is BodhiToken {
   uint256 public constant nativeDecimals = 18;
-  uint256 public constant decimals = 18;
 
   /// @notice 60 million BOT tokens for sale
   uint256 public constant saleAmount = 60 * (10**6) * (10**decimals);
-
-  /// @notice 100 million BOT tokens will ever be created
-  uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals);
 
   // Crowdsale parameters
   uint256 public fundingStartBlock;
@@ -22,21 +15,7 @@ contract CrowdsaleBodhiToken is StandardToken, Ownable {
   uint256 public initialExchangeRate;
 
   // Events
-  event Mint(uint256 supply, address indexed to, uint256 amount);
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-
-  // Modifiers
-  modifier validAddress(address _address) {
-    require(_address != 0x0);
-    _;
-  }
-
-  modifier validPurchase() {
-    require(block.number >= fundingStartBlock);
-    require(block.number <= fundingEndBlock);
-    require(msg.value > 0);
-    _;
-  }
 
   /// @notice Creates new CrowdsaleBodhiToken contract
   /// @param _fundingStartBlock The starting block of crowdsale
@@ -76,9 +55,13 @@ contract CrowdsaleBodhiToken is StandardToken, Ownable {
   /// @param _beneficiary Address that will contain the purchased tokens
   function buyTokens(address _beneficiary) 
     payable 
-    validAddress(_beneficiary) 
     validPurchase
   {
+    require(_beneficiary != address(0));
+    require(block.number >= fundingStartBlock);
+    require(block.number <= fundingEndBlock);
+    require(msg.value > 0);
+    
     uint256 tokenAmount = getTokenExchangeAmount(msg.value, initialExchangeRate, nativeDecimals, decimals);
     uint256 checkedSupply = totalSupply.add(tokenAmount);
 
@@ -88,7 +71,7 @@ contract CrowdsaleBodhiToken is StandardToken, Ownable {
     mint(_beneficiary, tokenAmount);
     TokenPurchase(msg.sender, _beneficiary, msg.value, tokenAmount);
 
-    forwardFunds();
+    owner.transfer(msg.value);
   }
 
   /// @notice Allows contract owner to mint tokens at any time
@@ -111,28 +94,12 @@ contract CrowdsaleBodhiToken is StandardToken, Ownable {
     uint256 _exchangeRate,
     uint256 _nativeDecimals, 
     uint256 _decimals) 
-    constant 
+    view 
     returns(uint256) 
   {
     require(_weiAmount > 0);
 
     uint256 differenceFactor = (10**_nativeDecimals) / (10**_decimals);
     return _weiAmount.mul(_exchangeRate).div(differenceFactor);
-  }
-
-  /// @dev Sends Ether to the contract owner
-  function forwardFunds() internal {
-    owner.transfer(msg.value);
-  } 
-
-  /// @dev Mints new tokens
-  /// @param _to Address to mint the tokens to
-  /// @param _amount Amount of tokens that will be minted
-  /// @return Boolean to signify successful minting
-  function mint(address _to, uint256 _amount) internal returns (bool) {
-    totalSupply += _amount;
-    balances[_to] = balances[_to].add(_amount);
-    Mint(totalSupply, _to, _amount);
-    return true;
   }
 }
