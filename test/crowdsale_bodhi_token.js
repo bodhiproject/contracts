@@ -14,6 +14,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
   const regexInvalidOpcode = /invalid opcode/;
   const blockHeightManager = new BlockHeightManager(web3);
   const validPurchaseBlock = (config.startBlock + config.endBlock) / 2;
+  const owner = accounts[0];
 
   let token;
   let decimals;
@@ -74,7 +75,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       assert.equal(initialSupply.toString(), presaleAmount.toString());
 
       let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
-      await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
+      await token.mintByOwner(owner, mintedTokenAmount, { from: owner });
 
       let actualMintSupply = web3.toBigNumber(await token.totalSupply());
       let expectedTotalSupply = initialSupply.add(mintedTokenAmount);
@@ -89,7 +90,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
       try {
         let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
-        await token.mintReservedTokens(mintedTokenAmount, {from: accounts[1]});
+        await token.mintByOwner(owner, mintedTokenAmount, { from: accounts[1] });
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
@@ -107,7 +108,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       let balanceBefore = await token.balanceOf(owner);
       let residualTokens = maxTokenSupply.sub(totalSupply);
 
-      await token.mintReservedTokens(residualTokens);
+      await token.mintByOwner(owner, residualTokens);
 
       let balanceAfter = await token.balanceOf(owner);
       assert.equal(balanceBefore.add(residualTokens).valueOf(), balanceAfter.valueOf());
@@ -122,7 +123,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       assert.isAbove(await requester.getBlockNumberAsync(), config.endBlock);
 
       let mintedTokenAmount = web3.toBigNumber(10e6 * Math.pow(10, decimals));
-      await token.mintReservedTokens(mintedTokenAmount, {from: accounts[0]});
+      await token.mintByOwner(owner, mintedTokenAmount, { from: owner });
 
       let actualTotalSupply = web3.toBigNumber(await token.totalSupply());
       let expectedTotalSupply = initialSupply.add(mintedTokenAmount);
@@ -136,7 +137,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
 
       let maxTokenSupply = await token.tokenTotalSupply();
       let maxMintAmount = maxTokenSupply.sub(initialSupply);
-      await token.mintReservedTokens(maxMintAmount, {from: accounts[0]});
+      await token.mintByOwner(owner, maxMintAmount, { from: owner });
 
       let actualTotalSupply = web3.toBigNumber(await token.totalSupply());
       let expectedTotalSupply = initialSupply.add(maxMintAmount);
@@ -155,7 +156,7 @@ contract('CrowdsaleBodhiToken', function(accounts) {
       try {
         let maxTokenSupply = await token.tokenTotalSupply();
         let overflowAmount = maxTokenSupply.sub(beforeTotalSupply).add(1);
-        await token.mintReservedTokens(overflowAmount, {from: accounts[0]});
+        await token.mintByOwner(owner, overflowAmount, { from: owner });
         assert.fail();
       } catch(e) {
         assert.match(e.toString(), regexInvalidOpcode);
