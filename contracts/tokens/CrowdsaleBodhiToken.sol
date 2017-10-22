@@ -84,7 +84,7 @@ contract CrowdsaleBodhiToken is BodhiToken {
         uint256 _nativeDecimals, 
         uint256 _decimals) 
         public
-        view 
+        pure 
         returns(uint256) 
     {
         require(_weiAmount > 0);
