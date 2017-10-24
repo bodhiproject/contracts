@@ -120,27 +120,26 @@ Saving artifacts...
 
 2. Assuming tools Solidity & Ethabi are installed
 
-3. Have all source code in one file, i.e. `BodhiToken.sol `
-
-4. Compile solidity code
+3. Compile solidity code
 
     ```
-    solc --optimize --bin --abi --hashes -o ./bodhitoken --overwrite BodhiToken.sol
+    solc --optimize --bin --abi --hashes --allow-paths libs/* -o bodhitoken --overwrite tokens/BodhiToken.sol
 
     ls bodhitoken
     # corresponding files compiled
-    BasicToken.abi           BodhiToken.abi           ERC20.abi                ERC20Basic.abi           Ownable.abi              SafeMath.abi             StandardToken.abi
-    BasicToken.bin           BodhiToken.bin           ERC20.bin                ERC20Basic.bin           Ownable.bin              SafeMath.bin             StandardToken.bin
-    BasicToken.signatures    BodhiToken.signatures    ERC20.signatures         ERC20Basic.signatures    Ownable.signatures       SafeMath.signatures      StandardToken.signatures
+    BasicToken.abi           BodhiToken.bin           ERC20.signatures         Ownable.abi              SafeMath.bin             StandardToken.signatures
+    BasicToken.bin           BodhiToken.signatures    ERC20Basic.abi           Ownable.bin              SafeMath.signatures      lib
+    BasicToken.signatures    ERC20.abi                ERC20Basic.bin           Ownable.signatures       StandardToken.abi
+    BodhiToken.abi           ERC20.bin                ERC20Basic.signatures    SafeMath.abi             StandardToken.bi
     ```
 
-5. Ensure qtum testnet is running
+4. Ensure qtum testnet is running
 
     `bin/qtumd -testnet -logevents`
 
     `-logevents` is optional for event log, you may be asked to add `-reindex` if existing local db is init without event logs
 
-6. generate owner address
+5. generate owner address
 
 
     ```
@@ -164,7 +163,7 @@ Saving artifacts...
     ```
 
 
-7. Copy previous compiled smartcontract binary code
+6. Copy previous compiled smartcontract binary code
 
     ```
     # mac only
@@ -194,7 +193,7 @@ Saving artifacts...
 
     `hash` is hash160(sender)
 
-9. Verification
+8. Verification
   * list contract in current block, `hash` should appear
 
   ```
@@ -236,7 +235,7 @@ Saving artifacts...
 }
   ```
 
-10. Call smartcontract
+9. Call smartcontract
 
   * find available func
   ```
@@ -295,7 +294,7 @@ f2fde38b: transferOwnership(address)
   string Bodhi Token
   ```
 
-11. `callcontract` vs `sendcontracr`
+10. `callcontract` vs `sendtocontract`
 
   * callcontract - This will interact with an already deployed smart contract on the Qtum blockchain, with all computation taking place off-chain and no persistence to the blockchain. This does not require gas.
 
@@ -306,6 +305,7 @@ f2fde38b: transferOwnership(address)
 ## TODOs
 1. ~~Deploy the contract to QTUM testnet.~~
 2. ~~Document the deployment procedure.~~
+3. call smartcontract with parameters
 
 ## License
 MIT
