@@ -79,6 +79,19 @@ contract('StandardToken', function(accounts) {
                 assert.match(e.message, /invalid opcode/);
             }
         });
+
+        it('should throw if the value is more than the allowed amount', async function() {
+            let acct1Allowance = 1000;
+            await instance.approve(acct1, acct1Allowance, { from: owner });
+            assert.equal(await instance.allowance(owner, acct1), acct1Allowance, 
+                'accounts[1] allowance does not match approved amount');
+
+            try {
+                await instance.transferFrom(owner, acct1, acct1Allowance + 1, { from: acct1 });
+            } catch(e) {
+                assert.match(e.message, /invalid opcode/);
+            }
+        });
     });
 
     describe('approve', async function() {
