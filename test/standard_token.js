@@ -146,7 +146,7 @@ contract('StandardToken', function(accounts) {
             assert.equal(await instance.allowance(owner, acct2), acct2Allowance, 
                 'accounts[2] allowance does not match');
 
-            assert.equal(await instance.allowance(owner, accounts[3]), 0, 'accounts[3] allowance does not match');
+            assert.equal(await instance.allowance(owner, acct3), 0, 'accounts[3] allowance does not match');
         });
     });
 });
