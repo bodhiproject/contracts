@@ -50,6 +50,8 @@ contract('BasicToken', function(accounts) {
             ownerBalance = ownerBalance - acct2TransferAmt;
             assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
                 'new owner balance does not match after second transfer');
+
+            
         });
 
         it('should throw if the to address is not valid', async function() {

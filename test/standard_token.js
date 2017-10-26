@@ -8,6 +8,7 @@ contract('StandardToken', function(accounts) {
     const owner = accounts[0];
     const acct1 = accounts[1];
     const acct2 = accounts[2];
+    const acct3 = accounts[3];
     const tokenParams = {
         _initialAccount: owner,
         _initialBalance: 10000000
@@ -34,6 +35,7 @@ contract('StandardToken', function(accounts) {
         it('should allow transferring the allowed amount', async function() {
             var ownerBalance = tokenParams._initialBalance;
 
+            // transfers from owner to accounts[1]
             let acct1Allowance = 1000;
             await instance.approve(acct1, acct1Allowance, { from: owner });
             assert.equal(await instance.allowance(owner, acct1), acct1Allowance, 
@@ -46,6 +48,7 @@ contract('StandardToken', function(accounts) {
             assert.equal(await instance.balanceOf(owner), ownerBalance, 
                 'owner balance does not match after first transfer');
 
+            // transfers from owner to accounts[2]
             let acct2Allowance = 3000;
             await instance.approve(acct2, acct2Allowance, { from: owner });
             assert.equal(await instance.allowance(owner, acct2), acct2Allowance, 
@@ -57,6 +60,16 @@ contract('StandardToken', function(accounts) {
             ownerBalance = ownerBalance - acct2Allowance;
             assert.equal(await instance.balanceOf(owner), ownerBalance, 
                 'owner balance does not match after second transfer');
+
+            // transfers from accounts[2] to accounts[3]
+            let acct3Allowance = 3000;
+            await instance.approve(acct3, acct3Allowance, { from: acct2 });
+            assert.equal(await instance.allowance(acct2, acct3), acct3Allowance, 
+                'accounts[3] allowance does not match approved amount');
+
+            await instance.transferFrom(acct2, acct3, acct3Allowance, { from: acct3 });
+            assert.equal(await instance.balanceOf(acct3), acct3Allowance, 'accounts[3] balance does not match');
+            assert.equal(await instance.balanceOf(acct2), 0, 'accounts[2] balance does not match');
         });
 
         it('should throw if the to address is not valid', async function() {
