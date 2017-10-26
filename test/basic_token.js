@@ -38,19 +38,17 @@ contract('BasicToken', function(accounts) {
 
             // transfer from owner to accounts[1]
             let acct1TransferAmt = 300000;
-            await instance.transfer(accounts[1], acct1TransferAmt, { from: owner });
-            assert.equal(await instance.balanceOf(accounts[1], { from: accounts[1] }), acct1TransferAmt, 
-                'accounts[1] balance does not match');
+            await instance.transfer(acct1, acct1TransferAmt, { from: owner });
+            assert.equal(await instance.balanceOf(acct1), acct1TransferAmt, 'accounts[1] balance does not match');
 
             ownerBalance = ownerBalance - acct1TransferAmt;
-            assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
+            assert.equal(await instance.balanceOf(owner), ownerBalance, 
                 'owner balance does not match after first transfer');
 
             // transfer from owner to accounts[2]
             let acct2TransferAmt = 250000;
-            await instance.transfer(accounts[2], acct2TransferAmt, { from: owner });
-            assert.equal(await instance.balanceOf(accounts[2], { from: accounts[2] }), acct2TransferAmt, 
-                'accounts[2] balance does not match');
+            await instance.transfer(acct2, acct2TransferAmt, { from: owner });
+            assert.equal(await instance.balanceOf(acct2), acct2TransferAmt, 'accounts[2] balance does not match');
 
             ownerBalance = ownerBalance - acct2TransferAmt;
             assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
@@ -71,16 +69,15 @@ contract('BasicToken', function(accounts) {
         });
 
         it('should throw if the balance of the transferer is less than the amount', async function() {
-            assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
-                'owner balance does not match');
+            assert.equal(await instance.balanceOf(owner), tokenParams._initialBalance, 'owner balance does not match');
             try {
-                await instance.transfer(accounts[1], tokenParams._initialBalance + 1, { from: owner });
+                await instance.transfer(acct1, tokenParams._initialBalance + 1, { from: owner });
             } catch(e) {
                 assert.match(e.message, /invalid opcode/);
             }
 
             try {
-                await instance.transfer(accounts[3], 1, { from: accounts[2] });
+                await instance.transfer(acct3, 1, { from: acct2 });
             } catch(e) {
                 assert.match(e.message, /invalid opcode/);
             }
@@ -89,12 +86,9 @@ contract('BasicToken', function(accounts) {
 
     describe('balanceOf', async function() {
         it('should return the right balance', async function() {
-            assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
-                'owner balance does not match');
-            assert.equal(await instance.balanceOf(accounts[1], { from: accounts[1] }), 0, 
-                'accounts[1] balance should be 0');
-            assert.equal(await instance.balanceOf(accounts[2], { from: accounts[2] }), 0, 
-                'accounts[2] balance should be 0');
+            assert.equal(await instance.balanceOf(owner), tokenParams._initialBalance, 'owner balance does not match');
+            assert.equal(await instance.balanceOf(acct1), 0, 'accounts[1] balance should be 0');
+            assert.equal(await instance.balanceOf(acct2), 0, 'accounts[2] balance should be 0');
         });
     });
 });
