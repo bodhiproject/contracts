@@ -17,18 +17,34 @@ contract('BasicToken', function(accounts) {
 
     describe('constructor', async function() {
         it('should initialize all the values correctly', async function() {
+            assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
+                'owner balance does not match');
             assert.equal(await instance.totalSupply.call(), tokenParams._initialBalance, 'totalSupply does not match');
         });
     });
 
     describe('transfer', async function() {
         it('should allow transfers if the account has tokens', async function() {
-            assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
-                'owner balance does not match');
-            assert.equal(await instance.balanceOf(accounts[1], { from: accounts[1] }), 0, 
-                'accounts[1] balance should be 0');
-            assert.equal(await instance.balanceOf(accounts[2], { from: accounts[2] }), 0, 
-                'accounts[2] balance should be 0');
+            var ownerBalance = tokenParams._initialBalance;
+            assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 'owner balance does not match');
+
+            let acct1TransferAmt = 300000;
+            await instance.transfer(accounts[1], acct1TransferAmt, { from: owner });
+            assert.equal(await instance.balanceOf(accounts[1], { from: accounts[1] }), acct1TransferAmt, 
+                'accounts[1] balance does not match');
+
+            ownerBalance = ownerBalance - acct1TransferAmt;
+            assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
+                'owner balance does not match after first transfer');
+
+            let acct2TransferAmt = 250000;
+            await instance.transfer(accounts[2], acct2TransferAmt, { from: owner });
+            assert.equal(await instance.balanceOf(accounts[2], { from: accounts[2] }), acct2TransferAmt, 
+                'accounts[2] balance does not match');
+
+            ownerBalance = ownerBalance - acct2TransferAmt;
+            assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
+                'new owner balance does not match after second transfer');
         });
     });
 

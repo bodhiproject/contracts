@@ -3,7 +3,7 @@ pragma solidity ^0.4.17;
 import '../../contracts/tokens/BasicToken.sol';
 
 contract BasicTokenMock is BasicToken {
-    function BasicTokenMock(address _initialAccount, uint256 _initialBalance) {
+    function BasicTokenMock(address _initialAccount, uint256 _initialBalance) public {
         balances[_initialAccount] = _initialBalance;
         totalSupply = _initialBalance;
     }
