@@ -6,6 +6,9 @@ const web3 = global.web3;
 contract('BasicToken', function(accounts) {
     const blockHeightManager = new BlockHeightManager(web3);
     const owner = accounts[0];
+    const acct1 = accounts[1];
+    const acct2 = accounts[2];
+    const acct3 = accounts[3];
     const tokenParams = {
         _initialAccount: owner,
         _initialBalance: 10000000
@@ -33,6 +36,7 @@ contract('BasicToken', function(accounts) {
             var ownerBalance = tokenParams._initialBalance;
             assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 'owner balance does not match');
 
+            // transfer from owner to accounts[1]
             let acct1TransferAmt = 300000;
             await instance.transfer(accounts[1], acct1TransferAmt, { from: owner });
             assert.equal(await instance.balanceOf(accounts[1], { from: accounts[1] }), acct1TransferAmt, 
@@ -42,6 +46,7 @@ contract('BasicToken', function(accounts) {
             assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
                 'owner balance does not match after first transfer');
 
+            // transfer from owner to accounts[2]
             let acct2TransferAmt = 250000;
             await instance.transfer(accounts[2], acct2TransferAmt, { from: owner });
             assert.equal(await instance.balanceOf(accounts[2], { from: accounts[2] }), acct2TransferAmt, 
@@ -51,7 +56,10 @@ contract('BasicToken', function(accounts) {
             assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
                 'new owner balance does not match after second transfer');
 
-            
+            // transfer from accounts[2] to accounts[3]
+            await instance.transfer(acct3, acct2TransferAmt, { from: acct2 });
+            assert.equal(await instance.balanceOf(acct3), acct2TransferAmt, 'accounts[3] balance does not match');
+            assert.equal(await instance.balanceOf(acct2), 0, 'accounts[2] balance should be 0');
         });
 
         it('should throw if the to address is not valid', async function() {
