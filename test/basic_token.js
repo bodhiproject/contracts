@@ -1,20 +1,24 @@
-const BasicToken = artifacts.require('./BasicToken.sol');
+const BasicTokenMock = artifacts.require('./mocks/BasicTokenMock.sol');
 const assert = require('chai').assert;
 const web3 = global.web3;
 
 contract('BasicToken', function(accounts) {
     const owner = accounts[0];
+    const tokenParams = {
+        _initialAccount: owner,
+        _initialBalance: 10000000
+    };
 
     let instance;
 
     beforeEach(async function() {
-        instance = await BasicToken.new({ from: owner });
+        instance = await BasicTokenMock.new(...Object.values(tokenParams), { from: owner });
     });
 
     describe('balanceOf', async function(){
-        it("should assert true", async function(done) {
-            assert.isTrue(true);
-            done();
+        it('should return the right balance', async function() {
+            assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
+                'owner balance does not match');
         });
     });
 });
