@@ -15,7 +15,24 @@ contract('BasicToken', function(accounts) {
         instance = await BasicTokenMock.new(...Object.values(tokenParams), { from: owner });
     });
 
-    describe('balanceOf', async function(){
+    describe('constructor', async function() {
+        it('should initialize all the values correctly', async function() {
+            assert.equal(await instance.totalSupply.call(), tokenParams._initialBalance, 'totalSupply does not match');
+        });
+    });
+
+    describe('transfer', async function() {
+        it('should allow transfers if the account has tokens', async function() {
+            assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
+                'owner balance does not match');
+            assert.equal(await instance.balanceOf(accounts[1], { from: accounts[1] }), 0, 
+                'accounts[1] balance should be 0');
+            assert.equal(await instance.balanceOf(accounts[2], { from: accounts[2] }), 0, 
+                'accounts[2] balance should be 0');
+        });
+    });
+
+    describe('balanceOf', async function() {
         it('should return the right balance', async function() {
             assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
                 'owner balance does not match');
