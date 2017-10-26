@@ -1,8 +1,10 @@
 const BasicTokenMock = artifacts.require('./mocks/BasicTokenMock.sol');
+const BlockHeightManager = require('./helpers/block_height_manager');
 const assert = require('chai').assert;
 const web3 = global.web3;
 
 contract('BasicToken', function(accounts) {
+    const blockHeightManager = new BlockHeightManager(web3);
     const owner = accounts[0];
     const tokenParams = {
         _initialAccount: owner,
@@ -10,6 +12,9 @@ contract('BasicToken', function(accounts) {
     };
 
     let instance;
+
+    beforeEach(blockHeightManager.snapshot);
+    afterEach(blockHeightManager.revert);
 
     beforeEach(async function() {
         instance = await BasicTokenMock.new(...Object.values(tokenParams), { from: owner });

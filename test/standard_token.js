@@ -8,7 +8,6 @@ contract('StandardToken', function(accounts) {
     const owner = accounts[0];
     const acct1 = accounts[1];
     const acct2 = accounts[2];
-
     const tokenParams = {
         _initialAccount: owner,
         _initialBalance: 10000000
