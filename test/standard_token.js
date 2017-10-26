@@ -22,6 +22,36 @@ contract('StandardToken', function(accounts) {
         });
     });
 
+    describe('transferFrom', async function() {
+        it('should allow transferring the allowed amount', async function() {
+            var ownerBalance = tokenParams._initialBalance;
+
+            let acct1Allowance = 1000;
+            await instance.approve(accounts[1], acct1Allowance, { from: owner });
+            assert.equal(await instance.allowance(owner, accounts[1]), acct1Allowance, 
+                'accounts[1] allowance does not match approved amount');
+
+            await instance.transferFrom(owner, accounts[1], acct1Allowance, { from: accounts[1] });
+            assert.equal(await instance.balanceOf(accounts[1]), acct1Allowance, 'accounts[1] balance does not match');
+
+            ownerBalance = ownerBalance - acct1Allowance;
+            assert.equal(await instance.balanceOf(owner), ownerBalance, 
+                'owner balance does not match after first transfer');
+
+            let acct2Allowance = 3000;
+            await instance.approve(accounts[2], acct2Allowance, { from: owner });
+            assert.equal(await instance.allowance(owner, accounts[2]), acct2Allowance, 
+                'accounts[2] allowance does not match approved amount');
+
+            await instance.transferFrom(owner, accounts[2], acct2Allowance, { from: accounts[2] });
+            assert.equal(await instance.balanceOf(accounts[2]), acct2Allowance, 'accounts[2] balance does not match');
+
+            ownerBalance = ownerBalance - acct2Allowance;
+            assert.equal(await instance.balanceOf(owner), ownerBalance, 
+                'owner balance does not match after second transfer');
+        });
+    });
+
     describe('approve', async function() {
         it('should allow approving', async function() {
             let acct1Allowance = 1000;
