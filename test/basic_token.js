@@ -19,6 +19,10 @@ contract('BasicToken', function(accounts) {
         it('should return the right balance', async function() {
             assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
                 'owner balance does not match');
+            assert.equal(await instance.balanceOf(accounts[1], { from: accounts[1] }), 0, 
+                'accounts[1] balance should be 0');
+            assert.equal(await instance.balanceOf(accounts[2], { from: accounts[2] }), 0, 
+                'accounts[2] balance should be 0');
         });
     });
 });
