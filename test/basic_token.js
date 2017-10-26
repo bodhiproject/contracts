@@ -46,6 +46,30 @@ contract('BasicToken', function(accounts) {
             assert.equal(await instance.balanceOf(owner, { from: owner }), ownerBalance, 
                 'new owner balance does not match after second transfer');
         });
+
+        it('should throw if the to address is not valid', async function() {
+            try {
+                await instance.transfer(0, 1000, { from: owner });
+            } catch(e) {
+                assert.match(e.message, /invalid opcode/);
+            }
+        });
+
+        it('should throw if the balance of the transferer is less than the amount', async function() {
+            assert.equal(await instance.balanceOf(owner, { from: owner }), tokenParams._initialBalance, 
+                'owner balance does not match');
+            try {
+                await instance.transfer(accounts[1], tokenParams._initialBalance + 1, { from: owner });
+            } catch(e) {
+                assert.match(e.message, /invalid opcode/);
+            }
+
+            try {
+                await instance.transfer(accounts[3], 1, { from: accounts[2] });
+            } catch(e) {
+                assert.match(e.message, /invalid opcode/);
+            }
+        });
     });
 
     describe('balanceOf', async function() {
