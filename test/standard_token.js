@@ -22,6 +22,33 @@ contract('StandardToken', function(accounts) {
         });
     });
 
+    describe('approve', async function() {
+        it('should allow approving', async function() {
+            let acct1Allowance = 1000;
+            await instance.approve(accounts[1], acct1Allowance, { from: owner });
+            assert.equal(await instance.allowance(owner, accounts[1]), acct1Allowance, 
+                'accounts[1] allowance does not match approved amount');
+
+            let acct2Allowance = 3000;
+            await instance.approve(accounts[2], acct2Allowance, { from: owner });
+            assert.equal(await instance.allowance(owner, accounts[2]), acct2Allowance, 
+                'accounts[2] allowance does not match approved amount');
+        });
+
+        it('should throw if the value is not 0 and has previous approval', async function() {
+            let acct1Allowance = 1000;
+            await instance.approve(accounts[1], acct1Allowance, { from: owner });
+            assert.equal(await instance.allowance(owner, accounts[1]), acct1Allowance, 
+                'accounts[1] allowance does not match approved amount');
+
+            try {
+                await instance.approve(accounts[1], 123, { from: owner });
+            } catch(e) {
+                assert.match(e.message, /invalid opcode/);
+            }
+        });
+    });
+
     describe('allowance', async function() {
         it('should return the right allowance', async function() {
             let acct1Allowance = 1000;
@@ -33,6 +60,8 @@ contract('StandardToken', function(accounts) {
             await instance.approve(accounts[2], acct2Allowance, { from: owner });
             assert.equal(await instance.allowance(owner, accounts[2]), acct2Allowance, 
                 'accounts[2] allowance does not match');
+
+            assert.equal(await instance.allowance(owner, accounts[3]), 0, 'accounts[3] allowance does not match');
         });
     });
 });
