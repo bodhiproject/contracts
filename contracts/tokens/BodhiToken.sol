@@ -7,7 +7,7 @@ contract BodhiToken is StandardToken, Ownable {
     // Token configurations
     string public constant name = "Bodhi Token";
     string public constant symbol = "BOT";
-    uint256 public constant decimals = 18;
+    uint256 public constant decimals = 8;
 
     uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT ever created
 
