@@ -19,6 +19,7 @@ For more information, visit our wiki page: [https://bodhiproject.github.io/wiki/
 1. Install Node JS: [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
 
     Tests use `async/await` so v7.0 or higher.
+    
     via commandline:
 
         $ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
