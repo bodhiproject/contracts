@@ -11,7 +11,7 @@ For more information, visit our wiki page: [https://bodhiproject.github.io/wiki/
 ### Toolchain
 
 * __truffle__: contract development environment
-* __mocha__ (included in truffle): test framework (provides DSL like `decsribe`, `it`, `beforeEach` etc.)
+* __mocha__ (included in truffle): test framework (provides DSL like `describe`, `it`, `beforeEach` etc.)
 * __chai__: enhanced assertion library
 * __ethereum-testrpc__: EVM and blockchain simulator
 
